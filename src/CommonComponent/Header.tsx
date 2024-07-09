@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 
-
 const components: { title: String; href: string; description: string }[] = [
   {
     title: "Alert Dialog",
@@ -42,11 +41,18 @@ const components: { title: String; href: string; description: string }[] = [
   },
 ];
 
-export function NavigationMenuDemo() {
+export function Header() {
   return (
-    <div className="flex justify-center items-center">
-    
+    <div className="flex justify-center items-center top-0  fixed w-full">
+      <div className="flex w-full text-white justify-between gap-6 items-center py-4 px-8 rounded-xl">
+        <div>
+          <h3>ExpenseWise</h3>
+        </div>
+        <div className="flex gap-5">
+          <h3>Documentation</h3>
+          <h3>Demo</h3>
+        </div>
+      </div>
     </div>
   );
 }
-
