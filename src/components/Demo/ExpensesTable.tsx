@@ -5,118 +5,223 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DynamicModal from "@/CommonComponent/DynamicModal";
 import AddNewExpense from "./AddNewExpense";
-import { addExpense } from "@/Redux/Slices/ExpensesSlice";
-import { expenseFormData } from "@/CoomanInterfaceDfined/ComonInterface";
+import { addExpense, getAllExpenses } from "@/Redux/Slices/ExpensesSlice";
+import {
+  expenseFormData,
+  tableRow,
+} from "@/CoomanInterfaceDfined/ComonInterface";
 import { useAppDispatch } from "../../../Hooks";
-
-function ccyFormat(num: number) {
-  return `${num.toFixed(2)}`;
-}
-
-function priceRow(qty: number, unit: number) {
-  return qty * unit;
-}
-
-function createRow(desc: string, qty: number, unit: number) {
-  const price = priceRow(qty, unit);
-  return { desc, qty, unit, price };
-}
-
-interface Row {
-  desc: string;
-  qty: number;
-  unit: number;
-  price: number;
-}
-
-function subtotal(items: readonly Row[]) {
-  return items.map(({ price }) => price).reduce((sum, i) => sum + i, 0);
-}
-
-const rows = [
-  createRow("Paperclips (Box)", 100, 1.15),
-  createRow("Paper (Case)", 10, 45.99),
-  createRow("Waste Basket", 2, 17.99),
-];
-
-const invoiceSubtotal = subtotal(rows);
+import { GridCellParams, GridColDef } from "@mui/x-data-grid";
+import { CiEdit } from "react-icons/ci";
+import { FaRegSave } from "react-icons/fa";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+import { TextField } from "@mui/material";
 
 export default function ExpensesTable() {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
-  const [row, setRow] = useState(rows);
+  const [row, setRow] = useState<tableRow[]>([]);
   const [formData, setFormData] = useState<expenseFormData>({
     desc: "",
     category: "",
-    qty: 0,
-    price: 0,
-    date: new Date("2024-07-27"),
+    date: "2024-07-27",
   });
-
+  const [editableRow, setEditableRow] = useState("");
   const handleAddExpense = () => {
     dispatch(addExpense(formData));
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await dispatch(getAllExpenses());
+      if (getAllExpenses.fulfilled.match(data)) {
+        // If fulfilled, set the row data from payload
+        setRow(data.payload.expensesList as tableRow[]);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  const handleAddExpenseClick = () => {
+    setRow((oldRow: tableRow[]) => [
+      ...oldRow,
+      {
+        _id: "",
+        desc: "",
+        category: "",
+        date: new Date(),
+      },
+    ]);
+  };
+
+  const handleRowChange = (id: string, field: keyof tableRow, value: any) => {
+    setRow((prevRows) =>
+      prevRows.map((row) => (row._id === id ? { ...row, [field]: value } : row))
+    );
+  };
+
+  const handleEditRow = (id: string) => {
+    setEditableRow(id);
+  };
+
+  const handleUpdateRow = (id: string) => {
+
+  };
+
+  const textFieldStyle = {
+    "& .MuiInputBase-input": {
+      color: "white",
+      padding: "4px !important",
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "none",
+      },
+    },
+  };
   return (
     <>
-      <TableContainer component={Paper} className=" text-white">
-        <Table sx={{ minWidth: 400 }} aria-label="spanning table" size="small">
-          <TableHead className="text-white">
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
             <TableRow>
-              <TableCell align="center" colSpan={3} className="text-white">
-                Details
-              </TableCell>
-              <TableCell align="right" className="text-white">
-                Price
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-white">Desc</TableCell>
-              <TableCell align="right" className="text-white">
-                Qty.
-              </TableCell>
-              <TableCell align="right" className="text-white">
-                Unit
-              </TableCell>
-              <TableCell align="right" className="text-white">
-                Sum
-              </TableCell>
+              <TableCell align="center">Description</TableCell>
+              <TableCell align="center">Quantity</TableCell>
+              <TableCell align="center">Price</TableCell>
+              <TableCell align="center">Category</TableCell>
+              <TableCell align="center">Date</TableCell>
+              <TableCell align="center">action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {row?.map((row) => (
-              <TableRow key={row.desc}>
-                <TableCell className="text-white">{row.desc}</TableCell>
-                <TableCell align="right" className="text-white">
-                  {row.qty}
-                </TableCell>
-                <TableCell align="right" className="text-white">
-                  {row.unit}
-                </TableCell>
-                <TableCell align="right" className="text-white">
-                  {ccyFormat(row.price)}
-                </TableCell>
-              </TableRow>
-            ))}
-            <TableRow>
-              <TableCell rowSpan={3} />
-              <TableCell colSpan={2} className="text-white" align="center">
-                Total
-              </TableCell>
-              <TableCell align="right" className="text-white">
-                {ccyFormat(invoiceSubtotal)}
-              </TableCell>
-            </TableRow>
+            {row.map((row) => {
+              const editable = row._id === editableRow;
+
+              return (
+                <TableRow
+                  key={row._id}
+                  hover
+                  // onClick={() => setEditableRow(row._id)}
+                >
+                  <TableCell width={140}>
+                    {editable ? (
+                      <TextField
+                        sx={textFieldStyle}
+                        value={row.desc}
+                        onChange={(e) =>
+                          handleRowChange(row._id, "desc", e.target.value)
+                        }
+                        focused
+                      />
+                    ) : (
+                      row.desc
+                    )}
+                  </TableCell>
+                  <TableCell width={110}>
+                    {editable ? (
+                      <TextField
+                        type="number"
+                        value={row.qyt}
+                        sx={textFieldStyle}
+                        onChange={(e) =>
+                          handleRowChange(
+                            row._id,
+                            "qyt",
+                            Number(e.target.value)
+                          )
+                        }
+                        fullWidth
+                      />
+                    ) : (
+                      row.qyt
+                    )}
+                  </TableCell>
+                  <TableCell width={110}>
+                    {editable ? (
+                      <TextField
+                        type="number"
+                        value={row.price}
+                        sx={textFieldStyle}
+                        onChange={(e) =>
+                          handleRowChange(
+                            row._id,
+                            "price",
+                            Number(e.target.value)
+                          )
+                        }
+                        fullWidth
+                      />
+                    ) : (
+                      row.price
+                    )}
+                  </TableCell>
+                  <TableCell width={140}>
+                    {editable ? (
+                      <TextField
+                        sx={textFieldStyle}
+                        margin="none"
+                        value={row.category}
+                        onChange={(e) =>
+                          handleRowChange(row._id, "category", e.target.value)
+                        }
+                        fullWidth
+                      />
+                    ) : (
+                      row.category
+                    )}
+                  </TableCell>
+                  <TableCell width={180}>
+                    {editable ? (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          sx={textFieldStyle}
+                          value={dayjs(new Date(row.date))}
+                          onChange={(newValue) => {
+                            handleRowChange(row._id, "date", newValue);
+                          }}
+                          slotProps={{ textField: { fullWidth: true } }}
+                        />
+                      </LocalizationProvider>
+                    ) : (
+                      (row.date instanceof Date
+                        ? dayjs(row.date)
+                        : dayjs(row.date)
+                      ).format("YYYY-MM-DD")
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <CiEdit
+                        color="white"
+                        size={"1.5em"}
+                        onClick={() => handleEditRow(row._id)}
+                      />
+                      <FaRegSave
+                        color="white"
+                        size={"1.5em"}
+                        onClick={() => handleUpdateRow(row._id)}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
+      {/* <DataGrid rows={row} columns={columns} getRowId={(row) => row._id} /> */}
       <div className="p-3 w-full">
         <button
           className="text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-gray-900 rounded-xl relative right-0"
-          onClick={() => setOpen(true)}
+          // onClick={() => setOpen(true)}
+          onClick={handleAddExpenseClick}
         >
           Add Expense
         </button>

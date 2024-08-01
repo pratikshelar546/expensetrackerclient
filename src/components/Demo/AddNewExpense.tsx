@@ -15,6 +15,7 @@ type Props = {
 };
 
 function AddNewExpense({ formData, setFormData }: Props) {
+  
   const handleItemChange = (event: SelectChangeEvent) => {
     const { name, value } = event.target;
 

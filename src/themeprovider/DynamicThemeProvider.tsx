@@ -23,9 +23,19 @@ declare module "@mui/material/styles" {
 
 // Define your custom theme
 const theme: MuiTheme = createTheme({
-    palette: {
-        mode: 'dark',
-      },
+  palette: {
+    mode: "dark",
+  },
+  // components: {
+  //   MuiInputBase: {
+  //     styleOverrides: {
+  //       input: {
+  //         color: "white",
+  //         padding: "0 !important",
+  //       },
+  //     },
+  //   },
+  // },
 });
 
 const DynamicThemeProvider = ({ children }: Children) => {
