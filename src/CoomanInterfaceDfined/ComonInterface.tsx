@@ -3,7 +3,7 @@ export interface expenseFormData {
   qyt?: number;
   price?: number;
   category: string;
-  date: String;
+  date: Date;
 }
 
 export interface tableRow {

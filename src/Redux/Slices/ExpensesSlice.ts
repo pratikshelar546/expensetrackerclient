@@ -5,11 +5,29 @@ import {
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
+interface updateExpensePayload {
+  data: expenseFormData;
+  id: String;
+}
+
+export const getAllExpenses = createAsyncThunk(
+  "expenses/getExpenses",
+  async () => {
+    try {
+      const response = await axios<{ expensesList: tableRow[] }>({
+        method: "GET",
+        url: `${process.env.NEXT_PUBLIC_API_URL}expenses`,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
 export const addExpense = createAsyncThunk(
   "expenses/addExpenses",
   async (data: expenseFormData) => {
-    console.log(process.env.NEXT_PUBLIC_API_URL);
-
     try {
       const response = await axios({
         method: "POST",
@@ -23,13 +41,14 @@ export const addExpense = createAsyncThunk(
   }
 );
 
-export const getAllExpenses = createAsyncThunk(
-  "expenses/getExpenses",
-  async () => {
+export const updateExpense = createAsyncThunk(
+  "expenses/updateExpenses",
+  async ({ data, id }: updateExpensePayload) => {
     try {
-      const response = await axios<{ expensesList: tableRow[] }>({
-        method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses`,
+      const response = await axios({
+        method: "PUT",
+        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/udpateExpense/${id}`,
+        data,
       });
       return response.data;
     } catch (error) {
@@ -85,6 +104,20 @@ const expenseSlice = createSlice({
       .addCase(getAllExpenses.rejected, (state, action) => {
         (state.status = "Failed"),
           (state.error = action.error.message || "Failed to get expense");
+      })
+      .addCase(updateExpense.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        updateExpense.fulfilled,
+        (state, action: PayloadAction<expenseFormData>) => {
+          state.status = "succeeded";
+          state.newExpense = action.payload;
+        }
+      )
+      .addCase(updateExpense.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to add expense";
       });
   },
 });

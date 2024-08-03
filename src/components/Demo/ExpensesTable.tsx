@@ -8,34 +8,34 @@ import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
 import DynamicModal from "@/CommonComponent/DynamicModal";
 import AddNewExpense from "./AddNewExpense";
-import { addExpense, getAllExpenses } from "@/Redux/Slices/ExpensesSlice";
+import {
+  addExpense,
+  getAllExpenses,
+  updateExpense,
+} from "@/Redux/Slices/ExpensesSlice";
 import {
   expenseFormData,
   tableRow,
 } from "@/CoomanInterfaceDfined/ComonInterface";
 import { useAppDispatch } from "../../../Hooks";
-import { GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { CiEdit } from "react-icons/ci";
 import { FaRegSave } from "react-icons/fa";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
-import { TextField } from "@mui/material";
+import dayjs from "dayjs";
+import { MenuItem, NativeSelect, Select, Tab, TextField } from "@mui/material";
+import { toast } from "react-toastify";
 
 export default function ExpensesTable() {
   const dispatch = useAppDispatch();
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const [row, setRow] = useState<tableRow[]>([]);
-  const [formData, setFormData] = useState<expenseFormData>({
-    desc: "",
-    category: "",
-    date: "2024-07-27",
-  });
+
   const [editableRow, setEditableRow] = useState("");
-  const handleAddExpense = () => {
-    dispatch(addExpense(formData));
-  };
+  // const handleAddExpense = () => {
+  //   dispatch(addExpense(formData));
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,15 +50,23 @@ export default function ExpensesTable() {
   }, [dispatch]);
 
   const handleAddExpenseClick = () => {
-    setRow((oldRow: tableRow[]) => [
-      ...oldRow,
-      {
-        _id: "",
-        desc: "",
-        category: "",
-        date: new Date(),
-      },
-    ]);
+    const hasNewRow = row.some((rows) => rows._id === "newRow");
+
+    if (hasNewRow) {
+      toast.error("Save previous expense");
+    } else {
+      setRow((oldRow: tableRow[]) => [
+        ...oldRow,
+        {
+          _id: "newRow",
+          desc: "",
+          category: "Transport",
+          qyt: 0,
+          price: 0,
+          date: new Date(),
+        },
+      ]);
+    }
   };
 
   const handleRowChange = (id: string, field: keyof tableRow, value: any) => {
@@ -72,7 +80,24 @@ export default function ExpensesTable() {
   };
 
   const handleUpdateRow = (id: string) => {
-
+    if (id === "newRow") {
+      const newRow = row.find((row) => row._id === id);
+      if (newRow) {
+        const { _id, ...rest } = newRow;
+        dispatch(addExpense(rest));
+        setRow((oldRow: tableRow[]) => {
+          const filteredRows = oldRow.filter((row) => row._id !== "newRow");
+          console.log(filteredRows);
+          return filteredRows;
+        });
+      }
+    } else {
+      const updateRow = row.find((row) => row._id === id);
+      if (updateRow) {
+        const { _id, ...rest } = updateRow;
+        dispatch(updateExpense({ data: rest, id }));
+      }
+    }
   };
 
   const textFieldStyle = {
@@ -86,10 +111,11 @@ export default function ExpensesTable() {
       },
     },
   };
+
   return (
     <>
       <TableContainer component={Paper}>
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell align="center">Description</TableCell>
@@ -102,13 +128,16 @@ export default function ExpensesTable() {
           </TableHead>
           <TableBody>
             {row.map((row) => {
-              const editable = row._id === editableRow;
+              const isNewRow = (newRow: tableRow) => newRow._id === "newRow";
+              const editable =
+                row._id === editableRow ||
+                (row._id === "newRow" && isNewRow(row));
 
               return (
                 <TableRow
                   key={row._id}
                   hover
-                  // onClick={() => setEditableRow(row._id)}
+                  onClick={() => setEditableRow(row._id)}
                 >
                   <TableCell width={140}>
                     {editable ? (
@@ -128,7 +157,7 @@ export default function ExpensesTable() {
                     {editable ? (
                       <TextField
                         type="number"
-                        value={row.qyt}
+                        value={row.qyt === 0 ? "" : row.qyt}
                         sx={textFieldStyle}
                         onChange={(e) =>
                           handleRowChange(
@@ -147,7 +176,7 @@ export default function ExpensesTable() {
                     {editable ? (
                       <TextField
                         type="number"
-                        value={row.price}
+                        value={row.price === 0 ? "" : row.price}
                         sx={textFieldStyle}
                         onChange={(e) =>
                           handleRowChange(
@@ -162,17 +191,22 @@ export default function ExpensesTable() {
                       row.price
                     )}
                   </TableCell>
+
                   <TableCell width={140}>
                     {editable ? (
-                      <TextField
-                        sx={textFieldStyle}
+                      <NativeSelect
+                        name="category"
+                        fullWidth
                         margin="none"
                         value={row.category}
                         onChange={(e) =>
                           handleRowChange(row._id, "category", e.target.value)
                         }
-                        fullWidth
-                      />
+                      >
+                        <option value={"Transport"}>Transport</option>
+                        <option value={"Food"}>Food</option>
+                        <option value={"Other Expenses"}>Other Expenses</option>
+                      </NativeSelect>
                     ) : (
                       row.category
                     )}
@@ -227,7 +261,7 @@ export default function ExpensesTable() {
         </button>
       </div>
 
-      {open && (
+      {/* {open && (
         <DynamicModal
           open={open}
           setOpen={setOpen}
@@ -238,7 +272,7 @@ export default function ExpensesTable() {
             <AddNewExpense formData={formData} setFormData={setFormData} />
           }
         />
-      )}
+      )} */}
     </>
   );
 }
