@@ -1,19 +1,28 @@
-import Image from "next/image";
+"use client";
 import React from "react";
 import tracker from "@/assets/icons/tracker.svg";
+import { Spotlight } from "./UI/Spotlight";
+import { BackgroundBeams } from "./UI/background-beans";
+import * as motion from "framer-motion/client";
 const MainPage = () => {
   return (
-    <div className="text-white mt-14 flex items-center justify-center">
-      <div className="flex max-w-6xl items-center justify-between">
-        <Image src={tracker} alt="tracker" className=" w-1/2 h-1/2" />
-        <h1 className=" text-2xl ">
-          Welcome to ExpenseWise! Effortlessly track expenses, set budgets, and
-          gain insights with our user-friendly platform. Enjoy real-time
-          updates, secure data, customizable categories, and mobile access.
-          Achieve your financial goals with ease and confidence. Start managing
-          your finances better with ExpenseWise today!
-        </h1>
+    <div className="text-white mt-14 flex items-center justify-center h-full antialiased relative">
+      {/* <Spotlight
+        className="-top-40 left-0 md:left-60 md:-top-20"
+        fill="#ffe4e4"
+        /> */}
+      <div className="flex max-w-6xl items-center justify-between h-[80vh]">
+        <motion.h1
+          initial={{ y: -50, x: -50, opacity: 0 }}
+          animate={{ y: 0, x: 0, opacity: 1 }}
+          transition={{ ease: "easeInOut", duration: 0.75 }}
+          className="text-5xl text-center"
+        >
+          Streamline finances with ExpenseWise Track,categorize,and manage
+          expenses easily
+        </motion.h1>
       </div>
+      <BackgroundBeams />
     </div>
   );
 };

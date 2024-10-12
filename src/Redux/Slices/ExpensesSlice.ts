@@ -1,7 +1,4 @@
-import {
-  expenseFormData,
-  tableRow,
-} from "@/CoomanInterfaceDfined/ComonInterface";
+import { expenseFormData, tableRow } from "@/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -49,6 +46,21 @@ export const updateExpense = createAsyncThunk(
         method: "PUT",
         url: `${process.env.NEXT_PUBLIC_API_URL}expenses/udpateExpense/${id}`,
         data,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+export const deleteExpenses = createAsyncThunk(
+  "expense/DeleteExpense",
+  async (id: String) => {
+    try {
+      const response = await axios({
+        method: "DELETE",
+        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/deleteExpense/${id}`,
       });
       return response.data;
     } catch (error) {
@@ -116,6 +128,20 @@ const expenseSlice = createSlice({
         }
       )
       .addCase(updateExpense.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to add expense";
+      })
+      .addCase(deleteExpenses.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        deleteExpenses.fulfilled,
+        (state, action: PayloadAction<expenseFormData>) => {
+          state.status = "succeeded";
+          state.newExpense = action.payload;
+        }
+      )
+      .addCase(deleteExpenses.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to add expense";
       });

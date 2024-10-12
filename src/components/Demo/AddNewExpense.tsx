@@ -1,4 +1,4 @@
-import { expenseFormData } from "@/CoomanInterfaceDfined/ComonInterface";
+import { expenseFormData } from "@/commanInterface/ComonInterface";
 import {
   FormControl,
   InputLabel,
@@ -15,7 +15,6 @@ type Props = {
 };
 
 function AddNewExpense({ formData, setFormData }: Props) {
-  
   const handleItemChange = (event: SelectChangeEvent) => {
     const { name, value } = event.target;
 

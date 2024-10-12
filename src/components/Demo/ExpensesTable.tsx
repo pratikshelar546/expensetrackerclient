@@ -6,48 +6,39 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
-import DynamicModal from "@/CommonComponent/DynamicModal";
-import AddNewExpense from "./AddNewExpense";
 import {
   addExpense,
+  deleteExpenses,
   getAllExpenses,
   updateExpense,
 } from "@/Redux/Slices/ExpensesSlice";
-import {
-  expenseFormData,
-  tableRow,
-} from "@/CoomanInterfaceDfined/ComonInterface";
+import { expenseFormData, tableRow } from "@/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../Hooks";
 import { CiEdit } from "react-icons/ci";
 import { FaRegSave } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { MenuItem, NativeSelect, Select, Tab, TextField } from "@mui/material";
+import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 
 export default function ExpensesTable() {
   const dispatch = useAppDispatch();
-  // const [open, setOpen] = useState(false);
   const [row, setRow] = useState<tableRow[]>([]);
 
   const [editableRow, setEditableRow] = useState("");
-  // const handleAddExpense = () => {
-  //   dispatch(addExpense(formData));
-  // };
 
+  const fetchData = async () => {
+    const data = await dispatch(getAllExpenses());
+    if (getAllExpenses.fulfilled.match(data)) {
+      setRow(data.payload.expensesList as tableRow[]);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await dispatch(getAllExpenses());
-      if (getAllExpenses.fulfilled.match(data)) {
-        // If fulfilled, set the row data from payload
-        setRow(data.payload.expensesList as tableRow[]);
-      }
-    };
-
     fetchData();
-  }, [dispatch]);
+  }, []);
 
   const handleAddExpenseClick = () => {
     const hasNewRow = row.some((rows) => rows._id === "newRow");
@@ -67,6 +58,7 @@ export default function ExpensesTable() {
         },
       ]);
     }
+    setEditableRow("newRow");
   };
 
   const handleRowChange = (id: string, field: keyof tableRow, value: any) => {
@@ -76,28 +68,40 @@ export default function ExpensesTable() {
   };
 
   const handleEditRow = (id: string) => {
-    setEditableRow(id);
+    setEditableRow(id === editableRow ? "" : id);
   };
 
-  const handleUpdateRow = (id: string) => {
+  const handleUpdateRow = async (id: string) => {
     if (id === "newRow") {
       const newRow = row.find((row) => row._id === id);
       if (newRow) {
         const { _id, ...rest } = newRow;
-        dispatch(addExpense(rest));
+        await dispatch(addExpense(rest));
+
         setRow((oldRow: tableRow[]) => {
-          const filteredRows = oldRow.filter((row) => row._id !== "newRow");
-          console.log(filteredRows);
-          return filteredRows;
+          return oldRow.filter((row) => row._id !== "newRow");
         });
+        await fetchData();
       }
     } else {
       const updateRow = row.find((row) => row._id === id);
       if (updateRow) {
         const { _id, ...rest } = updateRow;
-        dispatch(updateExpense({ data: rest, id }));
+        await dispatch(updateExpense({ data: rest, id }));
+        fetchData();
       }
     }
+
+    setEditableRow("");
+  };
+
+  const handleDeleteRow = async (id: String) => {
+    await dispatch(deleteExpenses(id));
+    fetchData();
+  };
+
+  const total = (items: readonly tableRow[]) => {
+    return items.map(({ price }) => price ?? 0).reduce((sum, i) => sum + i, 0);
   };
 
   const textFieldStyle = {
@@ -118,29 +122,60 @@ export default function ExpensesTable() {
         <Table size="small">
           <TableHead>
             <TableRow>
+              <TableCell align="center">Date</TableCell>
+              <TableCell align="center">Category</TableCell>
               <TableCell align="center">Description</TableCell>
               <TableCell align="center">Quantity</TableCell>
               <TableCell align="center">Price</TableCell>
-              <TableCell align="center">Category</TableCell>
-              <TableCell align="center">Date</TableCell>
               <TableCell align="center">action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {row.map((row) => {
-              const isNewRow = (newRow: tableRow) => newRow._id === "newRow";
-              const editable =
-                row._id === editableRow ||
-                (row._id === "newRow" && isNewRow(row));
+              const isEditable = row._id === editableRow;
 
               return (
-                <TableRow
-                  key={row._id}
-                  hover
-                  onClick={() => setEditableRow(row._id)}
-                >
+                <TableRow key={row._id} hover>
+                  <TableCell width={180}>
+                    {isEditable ? (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          sx={textFieldStyle}
+                          value={dayjs(new Date(row.date))}
+                          onChange={(newValue) => {
+                            handleRowChange(row._id, "date", newValue);
+                          }}
+                          slotProps={{ textField: { fullWidth: true } }}
+                        />
+                      </LocalizationProvider>
+                    ) : (
+                      (row.date instanceof Date
+                        ? dayjs(row.date)
+                        : dayjs(row.date)
+                      ).format("YYYY-MM-DD")
+                    )}
+                  </TableCell>
                   <TableCell width={140}>
-                    {editable ? (
+                    {isEditable ? (
+                      <NativeSelect
+                        name="category"
+                        fullWidth
+                        margin="none"
+                        value={row.category}
+                        onChange={(e) =>
+                          handleRowChange(row._id, "category", e.target.value)
+                        }
+                      >
+                        <option value={"Transport"}>Transport</option>
+                        <option value={"Food"}>Food</option>
+                        <option value={"Other Expenses"}>Other Expenses</option>
+                      </NativeSelect>
+                    ) : (
+                      row.category
+                    )}
+                  </TableCell>
+                  <TableCell width={140}>
+                    {isEditable ? (
                       <TextField
                         sx={textFieldStyle}
                         value={row.desc}
@@ -154,7 +189,7 @@ export default function ExpensesTable() {
                     )}
                   </TableCell>
                   <TableCell width={110}>
-                    {editable ? (
+                    {isEditable ? (
                       <TextField
                         type="number"
                         value={row.qyt === 0 ? "" : row.qyt}
@@ -173,7 +208,7 @@ export default function ExpensesTable() {
                     )}
                   </TableCell>
                   <TableCell width={110}>
-                    {editable ? (
+                    {isEditable ? (
                       <TextField
                         type="number"
                         value={row.price === 0 ? "" : row.price}
@@ -192,69 +227,46 @@ export default function ExpensesTable() {
                     )}
                   </TableCell>
 
-                  <TableCell width={140}>
-                    {editable ? (
-                      <NativeSelect
-                        name="category"
-                        fullWidth
-                        margin="none"
-                        value={row.category}
-                        onChange={(e) =>
-                          handleRowChange(row._id, "category", e.target.value)
-                        }
-                      >
-                        <option value={"Transport"}>Transport</option>
-                        <option value={"Food"}>Food</option>
-                        <option value={"Other Expenses"}>Other Expenses</option>
-                      </NativeSelect>
-                    ) : (
-                      row.category
-                    )}
-                  </TableCell>
-                  <TableCell width={180}>
-                    {editable ? (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          sx={textFieldStyle}
-                          value={dayjs(new Date(row.date))}
-                          onChange={(newValue) => {
-                            handleRowChange(row._id, "date", newValue);
-                          }}
-                          slotProps={{ textField: { fullWidth: true } }}
-                        />
-                      </LocalizationProvider>
-                    ) : (
-                      (row.date instanceof Date
-                        ? dayjs(row.date)
-                        : dayjs(row.date)
-                      ).format("YYYY-MM-DD")
-                    )}
-                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <CiEdit
+                      {isEditable ? (
+                        <FaRegSave
+                          color="white"
+                          size={"1.5em"}
+                          onClick={() => handleUpdateRow(row._id)}
+                        />
+                      ) : (
+                        <CiEdit
+                          color="white"
+                          size={"1.5em"}
+                          onClick={() => handleEditRow(row._id)}
+                        />
+                      )}
+                      <MdDelete
                         color="white"
                         size={"1.5em"}
-                        onClick={() => handleEditRow(row._id)}
-                      />
-                      <FaRegSave
-                        color="white"
-                        size={"1.5em"}
-                        onClick={() => handleUpdateRow(row._id)}
+                        onClick={() => handleDeleteRow(row._id)}
                       />
                     </div>
                   </TableCell>
                 </TableRow>
               );
             })}
+            <TableRow>
+              <TableCell />
+              <TableCell />
+              <TableCell rowSpan={4}>total</TableCell>
+              <TableCell />
+              <TableCell rowSpan={6}>{total(row)}</TableCell>
+              <TableCell />
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <DataGrid rows={row} columns={columns} getRowId={(row) => row._id} /> */}
+
       <div className="p-3 w-full">
         <button
           className="text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-gray-900 rounded-xl relative right-0"
-          // onClick={() => setOpen(true)}
           onClick={handleAddExpenseClick}
         >
           Add Expense
