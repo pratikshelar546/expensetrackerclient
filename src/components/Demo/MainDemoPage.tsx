@@ -4,7 +4,7 @@ import ExpensesTable from "./ExpensesTable";
 const MainDemoPage = () => {
   return (
     <div className="mt-24  flex items-center justify-center">
-      <div className="w-2/4 max-w-6xl">
+      <div className="lg:w-full w-full lg:max-w-6xl max-w-full p-4">
         <ExpensesTable />
       </div>
     </div>

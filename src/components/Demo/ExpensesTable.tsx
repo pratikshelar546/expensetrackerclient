@@ -12,7 +12,9 @@ import {
   getAllExpenses,
   updateExpense,
 } from "@/Redux/Slices/ExpensesSlice";
-import { expenseFormData, tableRow } from "@/commanInterface/ComonInterface";
+import {
+  tableRow,
+} from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../Hooks";
 import { CiEdit } from "react-icons/ci";
 import { FaRegSave } from "react-icons/fa";
@@ -23,6 +25,15 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
+
+const tableCellData = [
+  "Date",
+  "Category",
+  "Description",
+  "Quantity",
+  "Price",
+  "action",
+];
 
 export default function ExpensesTable() {
   const dispatch = useAppDispatch();
@@ -36,6 +47,7 @@ export default function ExpensesTable() {
       setRow(data.payload.expensesList as tableRow[]);
     }
   };
+  
   useEffect(() => {
     fetchData();
   }, []);
@@ -114,20 +126,29 @@ export default function ExpensesTable() {
         border: "none",
       },
     },
+    "& .MuiIconButton-root": {
+      color: "white",
+    },
   };
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        style={{ backgroundColor: "transparent", color: "white" }}
+      >
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell align="center">Date</TableCell>
-              <TableCell align="center">Category</TableCell>
-              <TableCell align="center">Description</TableCell>
-              <TableCell align="center">Quantity</TableCell>
-              <TableCell align="center">Price</TableCell>
-              <TableCell align="center">action</TableCell>
+              {tableCellData.map((cell, index) => (
+                <TableCell
+                  key={index}
+                  style={{ color: "white" }}
+                  align="center"
+                >
+                  {cell}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -136,7 +157,11 @@ export default function ExpensesTable() {
 
               return (
                 <TableRow key={row._id} hover>
-                  <TableCell width={180}>
+                  <TableCell
+                    width={180}
+                    align="center"
+                    style={{ color: "white" }}
+                  >
                     {isEditable ? (
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
@@ -155,7 +180,11 @@ export default function ExpensesTable() {
                       ).format("YYYY-MM-DD")
                     )}
                   </TableCell>
-                  <TableCell width={140}>
+                  <TableCell
+                    width={140}
+                    align="center"
+                    style={{ color: "white" }}
+                  >
                     {isEditable ? (
                       <NativeSelect
                         name="category"
@@ -165,16 +194,30 @@ export default function ExpensesTable() {
                         onChange={(e) =>
                           handleRowChange(row._id, "category", e.target.value)
                         }
+                        className=" text-white"
                       >
-                        <option value={"Transport"}>Transport</option>
-                        <option value={"Food"}>Food</option>
-                        <option value={"Other Expenses"}>Other Expenses</option>
+                        <option value={"Transport"} className=" text-black">
+                          Transport
+                        </option>
+                        <option value={"Food"} className=" text-black">
+                          Food
+                        </option>
+                        <option
+                          value={"Other Expenses"}
+                          className=" text-black"
+                        >
+                          Other Expenses
+                        </option>
                       </NativeSelect>
                     ) : (
                       row.category
                     )}
                   </TableCell>
-                  <TableCell width={140}>
+                  <TableCell
+                    width={140}
+                    align="center"
+                    style={{ color: "white" }}
+                  >
                     {isEditable ? (
                       <TextField
                         sx={textFieldStyle}
@@ -188,7 +231,11 @@ export default function ExpensesTable() {
                       row.desc
                     )}
                   </TableCell>
-                  <TableCell width={110}>
+                  <TableCell
+                    width={110}
+                    align="center"
+                    style={{ color: "white" }}
+                  >
                     {isEditable ? (
                       <TextField
                         type="number"
@@ -207,7 +254,11 @@ export default function ExpensesTable() {
                       row.qyt
                     )}
                   </TableCell>
-                  <TableCell width={110}>
+                  <TableCell
+                    width={110}
+                    align="center"
+                    style={{ color: "white" }}
+                  >
                     {isEditable ? (
                       <TextField
                         type="number"
@@ -227,8 +278,8 @@ export default function ExpensesTable() {
                     )}
                   </TableCell>
 
-                  <TableCell>
-                    <div className="flex gap-2">
+                  <TableCell width={110} align="center">
+                    <div className="flex gap-4 justify-center w-full">
                       {isEditable ? (
                         <FaRegSave
                           color="white"
@@ -255,9 +306,17 @@ export default function ExpensesTable() {
             <TableRow>
               <TableCell />
               <TableCell />
-              <TableCell rowSpan={4}>total</TableCell>
+              <TableCell
+                style={{ color: "white", fontSize: "20px" }}
+                align="center"
+                rowSpan={4}
+              >
+                Total
+              </TableCell>
               <TableCell />
-              <TableCell rowSpan={6}>{total(row)}</TableCell>
+              <TableCell style={{ color: "white" }} align="center" rowSpan={6}>
+                {total(row)}
+              </TableCell>
               <TableCell />
             </TableRow>
           </TableBody>

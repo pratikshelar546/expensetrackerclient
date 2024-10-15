@@ -1,4 +1,4 @@
-import { expenseFormData } from "@/commanInterface/ComonInterface";
+import { expenseFormData } from "@/assets/commanInterface/ComonInterface";
 import {
   FormControl,
   InputLabel,
@@ -7,7 +7,7 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent } from "react";
 
 type Props = {
   formData: expenseFormData;

@@ -1,4 +1,7 @@
-import { expenseFormData, tableRow } from "@/commanInterface/ComonInterface";
+import {
+  expenseFormData,
+  tableRow,
+} from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 

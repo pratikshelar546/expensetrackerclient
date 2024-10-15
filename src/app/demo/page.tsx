@@ -7,11 +7,11 @@ import React from "react";
 const DemoPage = () => {
   return (
     <>
-      <DynamicThemeProvider>
+      {/* <DynamicThemeProvider> */}
         <CustomProvider>
           <MainDemoPage />
         </CustomProvider>
-      </DynamicThemeProvider>
+      {/* </DynamicThemeProvider> */}
     </>
   );
 };

@@ -15,4 +15,8 @@ export interface tableRow {
   date: Date;
 }
 
+export interface userData {
+  email: string;
+  name: string;
+}
 // export default expenseFormData;

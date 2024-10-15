@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/CommonComponent/Header";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { NextAuthProvider } from "../CustomProvider/Provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,22 +25,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-mono bg-slate-950`}>
-        <section>
+        <NextAuthProvider>
           <Header />
-        </section>
-        <section>{children}</section>
-        <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
+          {children}
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
+        </NextAuthProvider>
       </body>
     </html>
   );
