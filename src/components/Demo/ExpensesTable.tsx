@@ -12,9 +12,7 @@ import {
   getAllExpenses,
   updateExpense,
 } from "@/Redux/Slices/ExpensesSlice";
-import {
-  tableRow,
-} from "@/assets/commanInterface/ComonInterface";
+import { tableRow } from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../Hooks";
 import { CiEdit } from "react-icons/ci";
 import { FaRegSave } from "react-icons/fa";
@@ -25,7 +23,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-
+import axios from "axios";
 const tableCellData = [
   "Date",
   "Category",
@@ -38,7 +36,6 @@ const tableCellData = [
 export default function ExpensesTable() {
   const dispatch = useAppDispatch();
   const [row, setRow] = useState<tableRow[]>([]);
-
   const [editableRow, setEditableRow] = useState("");
 
   const fetchData = async () => {
@@ -47,10 +44,31 @@ export default function ExpensesTable() {
       setRow(data.payload.expensesList as tableRow[]);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
+
+  const token = localStorage.getItem("token");
+  const createFeild = async () => {
+    const data = { feildName: "hello" };
+    try {
+      const response = await axios({
+        method: "POST",
+        url: `${process.env.NEXT_PUBLIC_API_URL}field/createField`,
+        data,
+        headers: {
+          Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
+        },
+      });
+
+      console.log(response);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
+  createFeild();
 
   const handleAddExpenseClick = () => {
     const hasNewRow = row.some((rows) => rows._id === "newRow");

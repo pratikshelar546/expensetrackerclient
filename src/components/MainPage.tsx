@@ -1,10 +1,13 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 // import tracker from "@/assets/icons/tracker.svg";
 // import { Spotlight } from "./UI/Spotlight";
 import { BackgroundBeams } from "./UI/background-beans";
 import * as motion from "framer-motion/client";
 const MainPage = () => {
+
+
+
   return (
     <div className="text-white mt-14 flex items-center justify-center h-full antialiased">
       {/* <Spotlight

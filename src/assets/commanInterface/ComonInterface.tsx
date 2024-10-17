@@ -1,3 +1,5 @@
+import { User } from "next-auth";
+
 export interface expenseFormData {
   desc: string;
   qyt?: number;
@@ -18,5 +20,11 @@ export interface tableRow {
 export interface userData {
   email: string;
   name: string;
+}
+
+export interface session {
+  user: User;
+  jwt: String;
+  expires: String;
 }
 // export default expenseFormData;

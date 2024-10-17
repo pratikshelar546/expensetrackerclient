@@ -4,9 +4,18 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import * as motion from "framer-motion/client";
 import SignInBtn from "./SignInBtn";
+import { getSession } from "next-auth/react";
 
 export function Header() {
   const router = useRouter();
+
+  const getSessionUtil = async () => {
+    const session = await getSession();
+    if (session?.jwt) localStorage.setItem("token", session?.jwt);
+  };
+
+  getSessionUtil();
+
   return (
     <div className="flex justify-center items-center top-0 z-[1] fixed w-full">
       <motion.div
