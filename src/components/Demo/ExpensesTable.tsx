@@ -50,25 +50,25 @@ export default function ExpensesTable() {
   }, []);
 
   const token = localStorage.getItem("token");
+
   const createFeild = async () => {
-    const data = { feildName: "hello" };
+    const data = { fieldName: "hello" };
     try {
       const response = await axios({
         method: "POST",
         url: `${process.env.NEXT_PUBLIC_API_URL}field/createField`,
-        data,
+        data: data,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
         },
       });
 
-      console.log(response);
     } catch (error: any) {
       console.log(error.message);
     }
   };
 
-  createFeild();
+  // createFeild();
 
   const handleAddExpenseClick = () => {
     const hasNewRow = row.some((rows) => rows._id === "newRow");
@@ -151,6 +151,9 @@ export default function ExpensesTable() {
 
   return (
     <>
+      <button className="text-white" onClick={createFeild}>
+        Add field
+      </button>
       <TableContainer
         component={Paper}
         style={{ backgroundColor: "transparent", color: "white" }}
