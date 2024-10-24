@@ -1,3 +1,4 @@
+"use client";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -12,7 +13,10 @@ import {
   getAllExpenses,
   updateExpense,
 } from "@/Redux/Slices/ExpensesSlice";
-import { tableRow } from "@/assets/commanInterface/ComonInterface";
+import {
+  expenseField,
+  tableRow,
+} from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../Hooks";
 import { CiEdit } from "react-icons/ci";
 import { FaRegSave } from "react-icons/fa";
@@ -24,6 +28,7 @@ import dayjs from "dayjs";
 import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { createField, getField } from "@/Redux/Slices/FieldSlice";
 const tableCellData = [
   "Date",
   "Category",
@@ -33,42 +38,42 @@ const tableCellData = [
   "action",
 ];
 
-export default function ExpensesTable() {
+export default function ExpensesTable({
+  fieldId,
+  isOpen,
+}: {
+  fieldId: string;
+  isOpen: string| null;
+}) {
   const dispatch = useAppDispatch();
   const [row, setRow] = useState<tableRow[]>([]);
   const [editableRow, setEditableRow] = useState("");
 
-  const fetchData = async () => {
-    const data = await dispatch(getAllExpenses());
-    if (getAllExpenses.fulfilled.match(data)) {
-      setRow(data.payload.expensesList as tableRow[]);
+  // fetch all fields here
+  // const fetchFieldData = async () => {
+  //   const fields = await dispatch(getField());
+  //   if (getField.fulfilled.match(fields)) {
+  //     setFieldId(fields.payload);
+  //   }
+  // };
+
+  // // function call for fetchfield
+  // useEffect(() => {
+  //   fetchFieldData();
+  // }, []);
+  console.log(fieldId);
+
+  // fetch all expenses for all the field
+  const fetchAllExpenses = async (fieldId: string) => {
+    const response = await dispatch(getAllExpenses(fieldId));
+    if (getAllExpenses.fulfilled.match(response)) {
+      setRow(response.payload.expensesList as tableRow[]);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchAllExpenses(fieldId);
   }, []);
-
-  const token = localStorage.getItem("token");
-
-  const createFeild = async () => {
-    const data = { fieldName: "hello" };
-    try {
-      const response = await axios({
-        method: "POST",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/createField`,
-        data: data,
-        headers: {
-          Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
-        },
-      });
-
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  };
-
-  // createFeild();
 
   const handleAddExpenseClick = () => {
     const hasNewRow = row.some((rows) => rows._id === "newRow");
@@ -106,19 +111,24 @@ export default function ExpensesTable() {
       const newRow = row.find((row) => row._id === id);
       if (newRow) {
         const { _id, ...rest } = newRow;
-        await dispatch(addExpense(rest));
+        await dispatch(
+          addExpense({
+            data: rest,
+            id: fieldId,
+          })
+        );
 
         setRow((oldRow: tableRow[]) => {
           return oldRow.filter((row) => row._id !== "newRow");
         });
-        await fetchData();
+        await fetchAllExpenses(fieldId);
       }
     } else {
       const updateRow = row.find((row) => row._id === id);
       if (updateRow) {
         const { _id, ...rest } = updateRow;
         await dispatch(updateExpense({ data: rest, id }));
-        fetchData();
+        fetchAllExpenses(fieldId);
       }
     }
 
@@ -127,7 +137,7 @@ export default function ExpensesTable() {
 
   const handleDeleteRow = async (id: String) => {
     await dispatch(deleteExpenses(id));
-    fetchData();
+    fetchAllExpenses(fieldId);
   };
 
   const total = (items: readonly tableRow[]) => {
@@ -150,13 +160,14 @@ export default function ExpensesTable() {
   };
 
   return (
-    <>
-      <button className="text-white" onClick={createFeild}>
-        Add field
-      </button>
+    <div className={isOpen === fieldId ? "block" : "hidden"}>
       <TableContainer
         component={Paper}
-        style={{ backgroundColor: "transparent", color: "white" }}
+        style={{
+          backgroundColor: "transparent",
+          color: "white",
+          padding: "1rem",
+        }}
       >
         <Table size="small">
           <TableHead>
@@ -201,6 +212,7 @@ export default function ExpensesTable() {
                       ).format("YYYY-MM-DD")
                     )}
                   </TableCell>
+
                   <TableCell
                     width={140}
                     align="center"
@@ -234,6 +246,7 @@ export default function ExpensesTable() {
                       row.category
                     )}
                   </TableCell>
+
                   <TableCell
                     width={140}
                     align="center"
@@ -252,6 +265,7 @@ export default function ExpensesTable() {
                       row.desc
                     )}
                   </TableCell>
+
                   <TableCell
                     width={110}
                     align="center"
@@ -275,6 +289,7 @@ export default function ExpensesTable() {
                       row.qyt
                     )}
                   </TableCell>
+
                   <TableCell
                     width={110}
                     align="center"
@@ -352,19 +367,6 @@ export default function ExpensesTable() {
           Add Expense
         </button>
       </div>
-
-      {/* {open && (
-        <DynamicModal
-          open={open}
-          setOpen={setOpen}
-          title="Add Your Expenses"
-          btnTitle="Submit"
-          btnAction={handleAddExpense}
-          component={
-            <AddNewExpense formData={formData} setFormData={setFormData} />
-          }
-        />
-      )} */}
-    </>
+    </div>
   );
 }

@@ -27,4 +27,14 @@ export interface session {
   jwt: String;
   expires: String;
 }
-// export default expenseFormData;
+
+export interface expenseField {
+  _id: string;
+  fieldId: String; 
+  fieldName: String; 
+  
+}
+
+export interface addField {
+  fieldName?: string;
+}

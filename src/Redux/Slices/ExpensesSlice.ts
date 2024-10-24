@@ -8,15 +8,18 @@ import axios from "axios";
 interface updateExpensePayload {
   data: expenseFormData;
   id: String;
+  fieldId?: String;
 }
 
 export const getAllExpenses = createAsyncThunk(
   "expenses/getExpenses",
-  async () => {
+  async (id: string) => {
+    console.log(id);
+
     try {
       const response = await axios<{ expensesList: tableRow[] }>({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/${id}`,
       });
       return response.data;
     } catch (error) {
@@ -27,11 +30,11 @@ export const getAllExpenses = createAsyncThunk(
 
 export const addExpense = createAsyncThunk(
   "expenses/addExpenses",
-  async (data: expenseFormData) => {
+  async ({ data, id }: updateExpensePayload) => {
     try {
       const response = await axios({
         method: "POST",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/addexpense`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/${id}/addexpense`,
         data,
       });
       return response.data;
