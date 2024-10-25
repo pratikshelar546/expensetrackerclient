@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 // import tracker from "@/assets/icons/tracker.svg";
 // import { Spotlight } from "./UI/Spotlight";
-import { BackgroundBeams } from "./UI/background-beans";
+import { BackgroundBeams } from "../CommonComponent/UI/background-beans";
 import * as motion from "framer-motion/client";
 const MainPage = () => {
 

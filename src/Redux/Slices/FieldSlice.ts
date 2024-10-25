@@ -1,3 +1,4 @@
+"use client"
 import {
   addField,
   expenseField,
