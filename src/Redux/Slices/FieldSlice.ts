@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   addField,
   expenseField,
@@ -10,12 +10,14 @@ const token = localStorage.getItem("token");
 
 export const createField = createAsyncThunk(
   "field/createField",
-  async ({ fieldName }: { fieldName: String }) => {
+  async (data : addField) => {
+    console.log(data);
+
     try {
       const response = await axios({
         method: "POST",
         url: `${process.env.NEXT_PUBLIC_API_URL}field/createField`,
-        data: { fieldName },
+        data,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
         },

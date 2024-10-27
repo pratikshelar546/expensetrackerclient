@@ -30,11 +30,11 @@ export interface session {
 
 export interface expenseField {
   _id: string;
-  fieldId: String; 
-  fieldName: String; 
-  
+  fieldId: String;
+  fieldName: String;
 }
 
 export interface addField {
   fieldName?: string;
+  RecivedAmount?: string;
 }

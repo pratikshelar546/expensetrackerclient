@@ -1,12 +1,29 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "../../../CommonComponent/UI/Label";
 import { Input } from "../../../CommonComponent/UI/Input";
 import { cn } from "@/lib/utils";
+import { useDispatch } from "react-redux";
+import { createField } from "@/Redux/Slices/FieldSlice";
+import { addField } from "@/assets/commanInterface/ComonInterface";
+import { useAppDispatch } from "../../../../Hooks";
 
 export function AddFieldForm() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const dispatch = useAppDispatch();
+  const [field, setField] = useState<addField>({
+    fieldName: "",
+    RecivedAmount: "",
+  });
+
+  const handleOnChange = (e: any) => {
+    const { name, value } = e.target;
+
+    setField((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    await dispatch(createField(field));
   };
   return (
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">
@@ -19,14 +36,29 @@ export function AddFieldForm() {
 
       <form className="mt-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Field Name</Label>
-          <Input id="fieldname" placeholder="Field 1" type="text" />
+          <Label htmlFor="fieldName">Field Name</Label>
+          <Input
+            id="fieldName"
+            required
+            name="fieldName"
+            placeholder="Field 1"
+            type="text"
+            value={field.fieldName ? field.fieldName : ""}
+            onChange={(e) => handleOnChange(e)}
+          />
         </LabelInputContainer>
 
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
           <LabelInputContainer>
-            <Label htmlFor="firstname">Recived Amount</Label>
-            <Input id="Fieldname" placeholder="9999" type="text" />
+            <Label htmlFor="RecivedAmount"> Amount</Label>
+            <Input
+              id="RecivedAmount"
+              placeholder="9999"
+              name="RecivedAmount"
+              value={field.RecivedAmount ? field.RecivedAmount : ""}
+              type="number"
+              onChange={(e) => handleOnChange(e)}
+            />
           </LabelInputContainer>
         </div>
 
@@ -66,3 +98,5 @@ const LabelInputContainer = ({
     </div>
   );
 };
+
+export default AddFieldForm;
