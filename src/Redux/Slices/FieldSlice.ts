@@ -10,7 +10,7 @@ const token = localStorage.getItem("token");
 
 export const createField = createAsyncThunk(
   "field/createField",
-  async (data : addField) => {
+  async (data: addField) => {
     console.log(data);
 
     try {
@@ -45,6 +45,24 @@ export const getField = createAsyncThunk("field/getField", async () => {
     throw error.message;
   }
 });
+
+export const deleteField = createAsyncThunk(
+  "field/DeleteField",
+  async (id: String) => {
+    try {
+      const response = await axios({
+        method: "DELETE",
+        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}`,
+        headers: {
+          Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
 interface fieldInitialState {
   expensesField: String;
@@ -91,6 +109,20 @@ const fieldSlice = createSlice({
         }
       )
       .addCase(getField.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to add expense";
+      })
+      .addCase(deleteField.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        deleteField.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.status = "succeeded";
+          state.expensesField = action.payload;
+        }
+      )
+      .addCase(deleteField.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to add expense";
       });
