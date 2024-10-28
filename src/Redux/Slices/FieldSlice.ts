@@ -8,6 +8,10 @@ import axios from "axios";
 
 const token = localStorage.getItem("token");
 
+interface updateField {
+  data: expenseField;
+  id: string;
+}
 export const createField = createAsyncThunk(
   "field/createField",
   async (data: addField) => {
@@ -64,15 +68,31 @@ export const deleteField = createAsyncThunk(
   }
 );
 
+export const updateField = createAsyncThunk(
+  "expenses/updateFields",
+  async ({ data, id }: updateField) => {
+    try {
+      const response = await axios({
+        method: "PUT",
+        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}/update`,
+        data,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
 interface fieldInitialState {
-  expensesField: String;
+  expensesField: expenseField | null;
   allField: expenseField[];
   status: String;
   error: String | null;
 }
 
 const initialState: fieldInitialState = {
-  expensesField: "",
+  expensesField: null,
   allField: [],
   status: "idle",
   error: null,
@@ -89,7 +109,7 @@ const fieldSlice = createSlice({
       })
       .addCase(
         createField.fulfilled,
-        (state, action: PayloadAction<String>) => {
+        (state, action: PayloadAction<expenseField>) => {
           state.status = "succeeded";
           state.expensesField = action.payload;
         }
@@ -117,12 +137,26 @@ const fieldSlice = createSlice({
       })
       .addCase(
         deleteField.fulfilled,
-        (state, action: PayloadAction<string>) => {
+        (state, action: PayloadAction<expenseField>) => {
           state.status = "succeeded";
           state.expensesField = action.payload;
         }
       )
       .addCase(deleteField.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to add expense";
+      })
+      .addCase(updateField.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        updateField.fulfilled,
+        (state, action: PayloadAction<expenseField>) => {
+          state.status = "succeeded";
+          state.expensesField = action.payload;
+        }
+      )
+      .addCase(updateField.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to add expense";
       });

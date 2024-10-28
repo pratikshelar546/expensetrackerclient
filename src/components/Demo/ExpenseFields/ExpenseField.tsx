@@ -1,3 +1,4 @@
+"use client"
 import { expenseField } from "@/assets/commanInterface/ComonInterface";
 import { createField, deleteField, getField } from "@/Redux/Slices/FieldSlice";
 import React, { useEffect, useState } from "react";
@@ -24,6 +25,15 @@ const ExpenseField = () => {
     fetchFieldData();
   }, []);
 
+  const toggleOpen = (id: string) => {
+    
+    if (isOpen === id) {          
+      setIsOpen(null);
+    } else {
+      setIsOpen(id);
+    }
+  };
+
   useEffect(() => {
     if (fieldId && fieldId.length > 0 && !isOpen) {
       setIsOpen(fieldId[0]?._id);
@@ -45,7 +55,7 @@ const ExpenseField = () => {
           <div
             key={feild._id}
             className=" border p-2 border-slate-400 mb-5 rounded-md"
-            onClick={() => setIsOpen(feild._id)}
+            onClick={() => toggleOpen(feild._id)}
           >
             <div className="flex justify-between">
               <h1 className="text-white px-4">{feild.fieldName}</h1>
@@ -58,11 +68,15 @@ const ExpenseField = () => {
               </button>
             </div>
 
-            <ExpensesTable
-              fieldId={feild._id}
-              key={feild._id}
-              isOpen={isOpen}
-            />
+            <ExpensesTable field={feild} key={feild._id} isOpen={isOpen} />
+            <h1 className="text-white px-4">
+              {feild?.RecivedAmount
+                ? `Recived amount : ${feild?.RecivedAmount}`
+                : null}
+            </h1>
+            <h1 className="text-white px-4">
+              {feild?.balance ? `Balance : ${feild?.balance}` : null}
+            </h1>
           </div>
         ))}
     </>

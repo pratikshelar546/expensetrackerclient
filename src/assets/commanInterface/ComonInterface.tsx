@@ -30,8 +30,10 @@ export interface session {
 
 export interface expenseField {
   _id: string;
-  fieldId: String;
-  fieldName: String;
+  fieldId: string;
+  fieldName?: string;
+  RecivedAmount?: number | null;
+  balance? :number |null
 }
 
 export interface addField {

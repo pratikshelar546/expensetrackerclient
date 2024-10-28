@@ -28,7 +28,8 @@ import dayjs from "dayjs";
 import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { createField, getField } from "@/Redux/Slices/FieldSlice";
+import { createField, getField, updateField } from "@/Redux/Slices/FieldSlice";
+import { totalmem } from "os";
 const tableCellData = [
   "Date",
   "Category",
@@ -39,32 +40,21 @@ const tableCellData = [
 ];
 
 export default function ExpensesTable({
-  fieldId,
   isOpen,
+  field,
 }: {
-  fieldId: string;
-  isOpen: string| null;
+  isOpen: string | null;
+  field: expenseField;
 }) {
+  
   const dispatch = useAppDispatch();
+  const {  balance, RecivedAmount } = field;
   const [row, setRow] = useState<tableRow[]>([]);
   const [editableRow, setEditableRow] = useState("");
 
-  // fetch all fields here
-  // const fetchFieldData = async () => {
-  //   const fields = await dispatch(getField());
-  //   if (getField.fulfilled.match(fields)) {
-  //     setFieldId(fields.payload);
-  //   }
-  // };
-
-  // // function call for fetchfield
-  // useEffect(() => {
-  //   fetchFieldData();
-  // }, []);
-  console.log(fieldId);
-
   // fetch all expenses for all the field
   const fetchAllExpenses = async (fieldId: string) => {
+    
     const response = await dispatch(getAllExpenses(fieldId));
     if (getAllExpenses.fulfilled.match(response)) {
       setRow(response.payload.expensesList as tableRow[]);
@@ -72,7 +62,7 @@ export default function ExpensesTable({
   };
 
   useEffect(() => {
-    fetchAllExpenses(fieldId);
+    fetchAllExpenses(field._id);
   }, []);
 
   const handleAddExpenseClick = () => {
@@ -114,21 +104,21 @@ export default function ExpensesTable({
         await dispatch(
           addExpense({
             data: rest,
-            id: fieldId,
+            id: field._id,
           })
         );
 
         setRow((oldRow: tableRow[]) => {
           return oldRow.filter((row) => row._id !== "newRow");
         });
-        await fetchAllExpenses(fieldId);
+        await fetchAllExpenses(field._id);
       }
     } else {
       const updateRow = row.find((row) => row._id === id);
       if (updateRow) {
         const { _id, ...rest } = updateRow;
         await dispatch(updateExpense({ data: rest, id }));
-        fetchAllExpenses(fieldId);
+        fetchAllExpenses(field._id);
       }
     }
 
@@ -137,11 +127,18 @@ export default function ExpensesTable({
 
   const handleDeleteRow = async (id: String) => {
     await dispatch(deleteExpenses(id));
-    fetchAllExpenses(fieldId);
+    fetchAllExpenses(field._id);
   };
 
-  const total = (items: readonly tableRow[]) => {
-    return items.map(({ price }) => price ?? 0).reduce((sum, i) => sum + i, 0);
+  const total = async (items: readonly tableRow[]) => {
+    const totalAmount = items
+      .map(({ price }) => price ?? 0)
+      .reduce((sum, i) => sum + i, 0);
+      const fieldBalance = (balance ?? RecivedAmount ?? 0) - totalAmount;
+      const feildToUpdate = { ...field, fieldBalance };
+      await dispatch(updateField({ data: feildToUpdate, id: field._id }));
+
+    return totalAmount;
   };
 
   const textFieldStyle = {
@@ -160,7 +157,7 @@ export default function ExpensesTable({
   };
 
   return (
-    <div className={isOpen === fieldId ? "block" : "hidden"}>
+    <div className={isOpen === field._id ? "block" : "hidden"}>
       <TableContainer
         component={Paper}
         style={{

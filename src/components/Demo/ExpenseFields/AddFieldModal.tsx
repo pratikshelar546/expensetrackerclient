@@ -33,13 +33,7 @@ export function AddFieldModal() {
         </ModalTrigger>
         <ModalBody>
           <ModalContent>
-            {/* <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-3">
-              Add New{" "}
-              <span className="px-1 py-0.5 rounded-md bg-gray-300 dark:bg-neutral-800 dark:border-neutral-700 border border-gray-200">
-                Field
-              </span>
-              !
-            </h4> */}
+          
             {/* <div className="flex justify-center items-center">
               {images.map((image, idx) => (
                 <motion.div
@@ -73,14 +67,7 @@ export function AddFieldModal() {
               <AddFieldForm />
             </div>
           </ModalContent>
-          {/* <ModalFooter className="gap-4">
-            <button className="px-2 py-1 bg-gray-200 text-black dark:bg-black dark:border-black dark:text-white border border-gray-300 rounded-md text-sm w-28">
-              Cancel
-            </button>
-            <button className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28">
-              
-            </button>
-          </ModalFooter> */}
+         
         </ModalBody>
       </Modal>
     </div>

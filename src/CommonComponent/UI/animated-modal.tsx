@@ -60,6 +60,31 @@ export const ModalTrigger = ({
   );
 };
 
+export const ModalClose = ({
+  children,
+  className,
+  validate,
+}: {
+  children: ReactNode;
+  className?: string;
+  validate: boolean;
+}) => {
+  const { setOpen } = useModal();
+  return (
+    <button
+      className={cn(
+        "dark px-4 py-2 rounded-md text-black dark:text-white text-center relative",
+        className
+      )}
+      onClick={() => {
+        !validate ? setOpen(false) : setOpen(true);
+      }}
+    >
+      {children}
+    </button>
+  );
+};
+
 export const ModalBody = ({
   children,
   className,
@@ -146,7 +171,9 @@ export const ModalContent = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("flex flex-col flex-1 p-8 md:p-5 bg-zinc-950", className)}>
+    <div
+      className={cn("flex flex-col flex-1 p-8 md:p-5 bg-zinc-950", className)}
+    >
       {children}
     </div>
   );

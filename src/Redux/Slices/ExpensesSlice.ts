@@ -14,13 +14,12 @@ interface updateExpensePayload {
 export const getAllExpenses = createAsyncThunk(
   "expenses/getExpenses",
   async (id: string) => {
-    console.log(id);
-
     try {
       const response = await axios<{ expensesList: tableRow[] }>({
         method: "GET",
         url: `${process.env.NEXT_PUBLIC_API_URL}expenses/${id}`,
       });
+
       return response.data;
     } catch (error) {
       throw error;
@@ -88,6 +87,7 @@ const initialState: expensesIntitalState = {
   status: "idle",
   error: null,
 };
+
 
 const expenseSlice = createSlice({
   name: "expenses",
