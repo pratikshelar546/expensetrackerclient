@@ -1,4 +1,3 @@
-"use client"
 import { expenseField } from "@/assets/commanInterface/ComonInterface";
 import { createField, deleteField, getField } from "@/Redux/Slices/FieldSlice";
 import React, { useEffect, useState } from "react";
@@ -9,7 +8,7 @@ import { AddFieldModal } from "./AddFieldModal";
 const ExpenseField = () => {
   const [fieldId, setFieldId] = useState<expenseField[]>([]);
   const [isOpen, setIsOpen] = useState<string | null>(null);
-
+  const [fieldBalance, setFieldBalnce] = useState<number>(0);
   const dispatch = useAppDispatch();
 
   const fetchFieldData = async () => {
@@ -26,8 +25,9 @@ const ExpenseField = () => {
   }, []);
 
   const toggleOpen = (id: string) => {
-    
-    if (isOpen === id) {          
+    console.log("trigger");
+
+    if (isOpen === id) {
       setIsOpen(null);
     } else {
       setIsOpen(id);
@@ -55,9 +55,11 @@ const ExpenseField = () => {
           <div
             key={feild._id}
             className=" border p-2 border-slate-400 mb-5 rounded-md"
-            onClick={() => toggleOpen(feild._id)}
           >
-            <div className="flex justify-between">
+            <div
+              className="flex justify-between"
+              onClick={() => toggleOpen(feild._id)}
+            >
               <h1 className="text-white px-4">{feild.fieldName}</h1>
 
               <button
@@ -68,14 +70,21 @@ const ExpenseField = () => {
               </button>
             </div>
 
-            <ExpensesTable field={feild} key={feild._id} isOpen={isOpen} />
+            <ExpensesTable
+              field={feild}
+              key={feild._id}
+              isOpen={isOpen}
+              setFieldBalnce={setFieldBalnce}
+              fieldBalance={fieldBalance}
+            />
             <h1 className="text-white px-4">
               {feild?.RecivedAmount
                 ? `Recived amount : ${feild?.RecivedAmount}`
                 : null}
             </h1>
+
             <h1 className="text-white px-4">
-              {feild?.balance ? `Balance : ${feild?.balance}` : null}
+              {fieldBalance ? `Balance : ${fieldBalance}` : null}
             </h1>
           </div>
         ))}

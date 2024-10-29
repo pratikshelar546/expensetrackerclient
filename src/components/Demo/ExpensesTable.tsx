@@ -6,7 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   addExpense,
   deleteExpenses,
@@ -27,9 +27,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-import axios from "axios";
-import { createField, getField, updateField } from "@/Redux/Slices/FieldSlice";
-import { totalmem } from "os";
+import { updateField } from "@/Redux/Slices/FieldSlice";
+
 const tableCellData = [
   "Date",
   "Category",
@@ -42,19 +41,22 @@ const tableCellData = [
 export default function ExpensesTable({
   isOpen,
   field,
+  fieldBalance,
+  setFieldBalnce,
 }: {
   isOpen: string | null;
   field: expenseField;
+  fieldBalance: number;
+  setFieldBalnce: Dispatch<SetStateAction<number>>;
 }) {
-  
   const dispatch = useAppDispatch();
-  const {  balance, RecivedAmount } = field;
+  const { balance, RecivedAmount } = field;
   const [row, setRow] = useState<tableRow[]>([]);
   const [editableRow, setEditableRow] = useState("");
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   // fetch all expenses for all the field
   const fetchAllExpenses = async (fieldId: string) => {
-    
     const response = await dispatch(getAllExpenses(fieldId));
     if (getAllExpenses.fulfilled.match(response)) {
       setRow(response.payload.expensesList as tableRow[]);
@@ -63,6 +65,10 @@ export default function ExpensesTable({
 
   useEffect(() => {
     fetchAllExpenses(field._id);
+
+    if (balance) {
+      setFieldBalnce(balance);
+    }
   }, []);
 
   const handleAddExpenseClick = () => {
@@ -122,6 +128,7 @@ export default function ExpensesTable({
       }
     }
 
+    calculateBalance();
     setEditableRow("");
   };
 
@@ -130,16 +137,19 @@ export default function ExpensesTable({
     fetchAllExpenses(field._id);
   };
 
-  const total = async (items: readonly tableRow[]) => {
-    const totalAmount = items
-      .map(({ price }) => price ?? 0)
-      .reduce((sum, i) => sum + i, 0);
-      const fieldBalance = (balance ?? RecivedAmount ?? 0) - totalAmount;
-      const feildToUpdate = { ...field, fieldBalance };
-      await dispatch(updateField({ data: feildToUpdate, id: field._id }));
+  const calculateBalance = async () => {
+    const fieldBalance = (balance ?? RecivedAmount ?? 0) - totalAmount;
+    setFieldBalnce(fieldBalance);
+    const feildToUpdate = { ...field, balance: fieldBalance };
+    console.log(fieldBalance);
 
-    return totalAmount;
+    await dispatch(updateField({ data: feildToUpdate, id: field._id }));
   };
+
+  useEffect(() => {
+    const calc = row.reduce((sum, { price = 0 }) => sum + price, 0);
+    setTotalAmount(calc);
+  }, [row]);
 
   const textFieldStyle = {
     "& .MuiInputBase-input": {
@@ -348,7 +358,7 @@ export default function ExpensesTable({
               </TableCell>
               <TableCell />
               <TableCell style={{ color: "white" }} align="center" rowSpan={6}>
-                {total(row)}
+                {totalAmount}
               </TableCell>
               <TableCell />
             </TableRow>

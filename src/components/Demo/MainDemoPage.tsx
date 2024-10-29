@@ -1,4 +1,4 @@
-"use "
+"use client"
 import React from "react";
 // import ExpensesTable from "./ExpensesTable";
 import ExpenseField from "./ExpenseFields/ExpenseField";

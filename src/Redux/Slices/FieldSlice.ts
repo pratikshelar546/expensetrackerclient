@@ -5,13 +5,17 @@ import {
 } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-
-const token = localStorage.getItem("token");
-
+let token = null;
+if (typeof window !== "undefined") {
+  token = localStorage.getItem("token");
+}
 interface updateField {
   data: expenseField;
   id: string;
 }
+
+console.log(token);
+
 export const createField = createAsyncThunk(
   "field/createField",
   async (data: addField) => {
@@ -76,6 +80,9 @@ export const updateField = createAsyncThunk(
         method: "PUT",
         url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}/update`,
         data,
+        headers: {
+          Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
+        },
       });
       return response.data;
     } catch (error) {
