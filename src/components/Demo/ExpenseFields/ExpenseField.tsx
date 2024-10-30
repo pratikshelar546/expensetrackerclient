@@ -46,6 +46,8 @@ const ExpenseField = () => {
     fetchFieldData();
   };
 
+  console.log();
+  
   return (
     <>
       <AddFieldModal />

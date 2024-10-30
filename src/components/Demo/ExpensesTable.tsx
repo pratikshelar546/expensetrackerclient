@@ -49,6 +49,7 @@ export default function ExpensesTable({
   fieldBalance: number;
   setFieldBalnce: Dispatch<SetStateAction<number>>;
 }) {
+
   const dispatch = useAppDispatch();
   const { balance, RecivedAmount } = field;
   const [row, setRow] = useState<tableRow[]>([]);
@@ -61,14 +62,11 @@ export default function ExpensesTable({
     if (getAllExpenses.fulfilled.match(response)) {
       setRow(response.payload.expensesList as tableRow[]);
     }
+      calculateBalance();
   };
 
   useEffect(() => {
     fetchAllExpenses(field._id);
-
-    if (balance) {
-      setFieldBalnce(balance);
-    }
   }, []);
 
   const handleAddExpenseClick = () => {
@@ -127,29 +125,29 @@ export default function ExpensesTable({
         fetchAllExpenses(field._id);
       }
     }
-
-    calculateBalance();
     setEditableRow("");
   };
 
   const handleDeleteRow = async (id: String) => {
     await dispatch(deleteExpenses(id));
-    fetchAllExpenses(field._id);
+    await fetchAllExpenses(field._id);
   };
 
   const calculateBalance = async () => {
-    const fieldBalance = (balance ?? RecivedAmount ?? 0) - totalAmount;
-    setFieldBalnce(fieldBalance);
+    console.log(balance, RecivedAmount, totalAmount);
+    const fieldBalance = (RecivedAmount ?? 0) - totalAmount;
     const feildToUpdate = { ...field, balance: fieldBalance };
-    console.log(fieldBalance);
-
+    await setFieldBalnce(fieldBalance);
     await dispatch(updateField({ data: feildToUpdate, id: field._id }));
   };
 
   useEffect(() => {
     const calc = row.reduce((sum, { price = 0 }) => sum + price, 0);
     setTotalAmount(calc);
+
   }, [row]);
+
+  console.log(totalAmount);
 
   const textFieldStyle = {
     "& .MuiInputBase-input": {
