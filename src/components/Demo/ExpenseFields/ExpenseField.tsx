@@ -8,7 +8,7 @@ import { AddFieldModal } from "./AddFieldModal";
 const ExpenseField = () => {
   const [fieldId, setFieldId] = useState<expenseField[]>([]);
   const [isOpen, setIsOpen] = useState<string | null>(null);
-  const [fieldBalance, setFieldBalnce] = useState<number>(0);
+
   const dispatch = useAppDispatch();
 
   const fetchFieldData = async () => {
@@ -47,7 +47,7 @@ const ExpenseField = () => {
   };
 
   console.log();
-  
+
   return (
     <>
       <AddFieldModal />
@@ -72,22 +72,7 @@ const ExpenseField = () => {
               </button>
             </div>
 
-            <ExpensesTable
-              field={feild}
-              key={feild._id}
-              isOpen={isOpen}
-              setFieldBalnce={setFieldBalnce}
-              fieldBalance={fieldBalance}
-            />
-            <h1 className="text-white px-4">
-              {feild?.RecivedAmount
-                ? `Recived amount : ${feild?.RecivedAmount}`
-                : null}
-            </h1>
-
-            <h1 className="text-white px-4">
-              {fieldBalance ? `Balance : ${fieldBalance}` : null}
-            </h1>
+            <ExpensesTable field={feild} key={feild._id} isOpen={isOpen} />
           </div>
         ))}
     </>
