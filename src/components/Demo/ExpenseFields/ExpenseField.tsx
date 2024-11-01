@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ExpensesTable from "../ExpensesTable";
 import { useAppDispatch } from "../../../../Hooks";
 import { AddFieldModal } from "./AddFieldModal";
+import { ExpandableCardDemo } from "../ExpandableCard/ExpandableCard";
 
 const ExpenseField = () => {
   const [fieldId, setFieldId] = useState<expenseField[]>([]);
@@ -51,8 +52,8 @@ const ExpenseField = () => {
   return (
     <>
       <AddFieldModal />
-
-      {fieldId &&
+      <ExpandableCardDemo field={fieldId} />
+      {/* {fieldId &&
         fieldId.map((feild) => (
           <div
             key={feild._id}
@@ -74,7 +75,7 @@ const ExpenseField = () => {
 
             <ExpensesTable field={feild} key={feild._id} isOpen={isOpen} />
           </div>
-        ))}
+        ))} */}
     </>
   );
 };

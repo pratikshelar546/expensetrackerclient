@@ -29,22 +29,9 @@ import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import { updateField } from "@/Redux/Slices/FieldSlice";
 
-const tableCellData = [
-  "Date",
-  "Category",
-  "Description",
-  "Quantity",
-  "Price",
-  "action",
-];
+const tableCellData = ["Date", "Category", "Description", "Price", "action"];
 
-export default function ExpensesTable({
-  isOpen,
-  field,
-}: {
-  isOpen: string | null;
-  field: expenseField;
-}) {
+export default function ExpensesTable({ field }: { field: expenseField }) {
   const dispatch = useAppDispatch();
   const { balance, RecivedAmount } = field;
   const [row, setRow] = useState<tableRow[]>([]);
@@ -118,7 +105,7 @@ export default function ExpensesTable({
         });
         await fetchAllExpenses(field._id);
 
-        calculateBalance();
+        await calculateBalance();
       }
     } else {
       const updateRow = row.find((row) => row._id === id);
@@ -135,24 +122,32 @@ export default function ExpensesTable({
   const handleDeleteRow = async (id: String) => {
     await dispatch(deleteExpenses(id));
     await fetchAllExpenses(field._id);
+    console.log("deleteing");
+
     calculateBalance();
+    console.log("deleteing done");
   };
 
   const calculateBalance = async () => {
+    console.log("calculating");
+
     const feildToUpdate = { ...field, balance: fieldBalance };
     await dispatch(updateField({ data: feildToUpdate, id: field._id }));
-    setFieldBalnce(fieldBalance);
+    // setFieldBalnce(fieldBalance);
+    console.log("calculating done");
   };
 
   useEffect(() => {
     const calc = row.reduce((sum, { price = 0 }) => sum + price, 0);
     setTotalAmount(calc);
     console.log("calc");
-    if (calc) {
-      const fieldBalance = (RecivedAmount ?? 0) - calc;
-      setFieldBalnce(fieldBalance);
-    }
+    console.log("setting");
+
+    const fieldBalance = (RecivedAmount ?? 0) - calc;
+    setFieldBalnce(fieldBalance);
   }, [row]);
+
+  console.log(fieldBalance, "balance");
 
   const textFieldStyle = {
     "& .MuiInputBase-input": {
@@ -170,7 +165,9 @@ export default function ExpensesTable({
   };
 
   return (
-    <div className={isOpen === field._id ? "block" : "hidden"}>
+    <div
+    // className={isOpen === field._id ? "block" : "hidden"}
+    >
       <TableContainer
         component={Paper}
         style={{
@@ -232,6 +229,7 @@ export default function ExpensesTable({
                       <NativeSelect
                         name="category"
                         fullWidth
+                        style={{ color: "white" }}
                         margin="none"
                         value={row.category}
                         onChange={(e) =>
@@ -273,30 +271,6 @@ export default function ExpensesTable({
                       />
                     ) : (
                       row.desc
-                    )}
-                  </TableCell>
-
-                  <TableCell
-                    width={110}
-                    align="center"
-                    style={{ color: "white" }}
-                  >
-                    {isEditable ? (
-                      <TextField
-                        type="number"
-                        value={row.qyt === 0 ? "" : row.qyt}
-                        sx={textFieldStyle}
-                        onChange={(e) =>
-                          handleRowChange(
-                            row._id,
-                            "qyt",
-                            Number(e.target.value)
-                          )
-                        }
-                        fullWidth
-                      />
-                    ) : (
-                      row.qyt
                     )}
                   </TableCell>
 
@@ -351,7 +325,6 @@ export default function ExpensesTable({
             })}
             <TableRow>
               <TableCell />
-              <TableCell />
               <TableCell
                 style={{ color: "white", fontSize: "20px" }}
                 align="center"
@@ -369,22 +342,17 @@ export default function ExpensesTable({
         </Table>
       </TableContainer>
 
-      <div className="p-3 w-full">
+      <div className="p-3 w-full flex justify-between items-center">
+      <h1 className="text-white border border-gray-400 py-2 px-4   rounded-xl relative right-0">
+          {fieldBalance ? `Balance : ${fieldBalance}` : null}
+        </h1>
         <button
-          className="text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-gray-900 rounded-xl relative right-0"
+          className="text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0"
           onClick={handleAddExpenseClick}
         >
           Add Expense
         </button>
-        <h1 className="text-white px-4">
-          {field?.RecivedAmount
-            ? `Recived amount : ${field?.RecivedAmount}`
-            : null}
-        </h1>
-
-        <h1 className="text-white px-4">
-          {fieldBalance ? `Balance : ${fieldBalance}` : null}
-        </h1>
+       
       </div>
     </div>
   );
