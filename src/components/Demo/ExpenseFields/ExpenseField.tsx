@@ -44,7 +44,7 @@ const ExpenseField = () => {
   const handleDelete = async (id: string) => {
     await dispatch(deleteField(id));
 
-    fetchFieldData();
+    await fetchFieldData();
   };
 
   console.log();
@@ -52,31 +52,7 @@ const ExpenseField = () => {
   return (
     <>
       <AddFieldModal />
-      <ExpandableCardDemo field={fieldId} handleDeleteField = {handleDelete} />
-
-      {/* {fieldId &&
-        fieldId.map((feild) => (
-          <div
-            key={feild._id}
-            className=" border p-2 border-slate-400 mb-5 rounded-md"
-          >
-            <div
-              className="flex justify-between"
-              onClick={() => toggleOpen(feild._id)}
-            >
-              <h1 className="text-white px-4">{feild.fieldName}</h1>
-
-              <button
-                className="text-white px-4 cursor-pointer outline-none"
-                onClick={() => handleDelete(feild._id)}
-              >
-                Delete Field
-              </button>
-            </div>
-
-            <ExpensesTable field={feild} key={feild._id} isOpen={isOpen} />
-          </div>
-        ))} */}
+      <ExpandableCardDemo field={fieldId} handleDeleteField={handleDelete} />
     </>
   );
 };

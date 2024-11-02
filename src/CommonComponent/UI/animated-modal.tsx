@@ -69,6 +69,8 @@ export const ModalClose = ({
   className?: string;
   validate: boolean;
 }) => {
+  console.log(!validate);
+  
   const { setOpen } = useModal();
   return (
     <button

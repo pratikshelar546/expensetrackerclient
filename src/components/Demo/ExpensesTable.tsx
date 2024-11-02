@@ -33,26 +33,23 @@ import useCheckDeviceView from "@/Hooks/useDeviceCheck";
 
 const tableCellData = ["Date", "Category", "Description", "Price", "action"];
 
-export default function ExpensesTable({ field }: { field: expenseField }) {
+export default function ExpensesTable({
+  field,
+  handleDeleteField,
+  setActive,
+}: {
+  field: expenseField;
+  handleDeleteField: (id: string) => Promise<void>;
+  setActive: Dispatch<SetStateAction<number | boolean | expenseField | null>>;
+}) {
   const dispatch = useAppDispatch();
   const { RecivedAmount } = field;
   const [row, setRow] = useState<tableRow[]>([]);
   const [editableRow, setEditableRow] = useState<string>("");
-  const [totalAmount, setTotalAmount] = useState<number>(0);
-  const [fieldBalance, setFieldBalnce] = useState<number>(field.balance ?? 0);
   const isMobile = useCheckDeviceView();
-  const calculateTotalAmount = () => {
-    const calc = row.reduce((sum, { price = 0 }) => sum + price, 0);
-    setTotalAmount(calc);
-    console.log("toal", calc, totalAmount);
-  };
 
-  const calculateFeildBalance = () => {
-    console.log("fbal");
-
-    const fieldBalance = (RecivedAmount ?? 0) - totalAmount;
-    setFieldBalnce(fieldBalance);
-  };
+  const totalAmount = row?.reduce((sum, { price = 0 }) => sum + price, 0);
+  const fieldBalance = (RecivedAmount ?? 0) - totalAmount;
 
   // fetch all expenses for all the field
   const fetchAllExpenses = async (fieldId: string) => {
@@ -84,8 +81,6 @@ export default function ExpensesTable({ field }: { field: expenseField }) {
         },
       ]);
     }
-    // calculateBalance();
-
     setEditableRow("newRow");
   };
 
@@ -100,8 +95,6 @@ export default function ExpensesTable({ field }: { field: expenseField }) {
   };
 
   const handleUpdateRow = async (id: string) => {
-    console.log("called");
-
     if (id === "newRow") {
       const newRow = row.find((row) => row._id === id);
       if (newRow) {
@@ -123,73 +116,34 @@ export default function ExpensesTable({ field }: { field: expenseField }) {
         fetchAllExpenses(field._id);
       }
     }
-    console.log(totalAmount, fieldBalance);
-    calculateBalance();
+    const newTotal = row.reduce((sum, { price = 0 }) => sum + price, 0);
+    const newBalance = (RecivedAmount ?? 0) - newTotal;
+
+    const updatedField = { ...field, balance: newBalance };
+    await dispatch(updateField({ data: updatedField, id: field._id }));
     setEditableRow("");
   };
 
-  // const handleDeleteRow = async (id: String) => {
-  //   await dispatch(deleteExpenses(id));
-  //   await fetchAllExpenses(field._id);
-  // };
-
   const handleDeleteRow = async (id: string) => {
-    console.log("called delete");
     const deletedRow = row.find((r) => r._id === id);
-    if (deletedRow) {
-      console.log("deleting row");
 
+    if (deletedRow) {
+      // Delete the expense in the database
       await dispatch(deleteExpenses(id));
+
+      // Update the local row state by filtering out the deleted row
       setRow((prevRows) => prevRows.filter((r) => r._id !== id));
 
-      const newBalance = (RecivedAmount ?? 0) - totalAmount;
-      setFieldBalnce(newBalance);
+      // Recalculate totalAmount and fieldBalance locally after deletion
+      const newTotalAmount = row
+        .filter((r) => r._id !== id)
+        .reduce((sum, { price = 0 }) => sum + price, 0);
+      const newBalance = (RecivedAmount ?? 0) - newTotalAmount;
 
-      // Use useEffect to trigger calculateBalance after fieldBalance updates
+      const updatedField = { ...field, balance: newBalance };
+      await dispatch(updateField({ data: updatedField, id: field._id }));
     }
-    calculateBalance();
-    console.log("row deleted");
   };
-
-  // UseEffect to trigger calculateBalance when fieldBalance changes
-  // useEffect(() => {
-  //   if (fieldBalance !== null) {
-  //     // calculateBalance();
-  //     debouncedUpdateField();
-  //   }
-  // }, [fieldBalance]);
-
-  // const debounce = (func: Function, delay: number) => {
-  //   let timer: NodeJS.Timeout;
-  //   return (...args: any[]) => {
-  //     clearTimeout(timer);
-  //     timer = setTimeout(() => func(...args), delay);
-  //   };
-  // };
-
-  // const debouncedUpdateField = debounce(() => {
-  //   calculateBalance();
-  // }, 2000);
-
-  useEffect(() => {
-    console.log("effect");
-
-    const calc = row.reduce((sum, { price = 0 }) => sum + price, 0);
-    setTotalAmount(calc);
-
-    const bal = (RecivedAmount ?? 0) - calc;
-    setFieldBalnce(bal);
-  }, [row]);
-
-  const calculateBalance = async () => {
-    console.log("calcualting", fieldBalance);
-
-    const feildToUpdate = { ...field, balance: fieldBalance };
-    await dispatch(updateField({ data: feildToUpdate, id: field._id }));
-    console.log("done");
-  };
-
-  console.log(totalAmount, fieldBalance);
 
   const textFieldStyle = {
     "& .MuiInputBase-input": {
@@ -207,9 +161,7 @@ export default function ExpensesTable({ field }: { field: expenseField }) {
   };
 
   return (
-    <div
-    // className={isOpen === field._id ? "block" : "hidden"}
-    >
+    <>
       {isMobile ? (
         <MobileExpenseSection
           row={row}
@@ -405,12 +357,21 @@ export default function ExpensesTable({ field }: { field: expenseField }) {
           {fieldBalance ? `Balance : ${fieldBalance}` : null}
         </h1>
         <button
+          className=" cursor-pointer outline-none text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0 "
+          onClick={() => {
+            handleDeleteField(field._id);
+            setActive(false);
+          }}
+        >
+          Delete Field
+        </button>
+        <button
           className="text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0 "
           onClick={handleAddExpenseClick}
         >
           Add Expense
         </button>
       </div>
-    </div>
+    </>
   );
 }

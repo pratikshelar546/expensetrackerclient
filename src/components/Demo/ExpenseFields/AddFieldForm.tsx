@@ -27,9 +27,15 @@ export function AddFieldForm() {
     if (field.fieldName === "") {
       setValidate(false);
     } else {
+      setValidate(true);
       await dispatch(createField(field));
+      setField({ fieldName: "",
+        RecivedAmount: "",})
     }
   };
+
+  console.log(validate);
+
   return (
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
@@ -44,7 +50,7 @@ export function AddFieldForm() {
           <Label htmlFor="fieldName">Field Name</Label>
           <Input
             id="fieldName"
-            required
+            
             name="fieldName"
             placeholder="Field 1"
             type="text"
