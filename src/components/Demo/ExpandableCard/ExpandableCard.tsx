@@ -6,7 +6,13 @@ import { useOutsideClick } from "@/Hooks/use-outside-click";
 import ExpenseField from "../ExpenseFields/ExpenseField";
 import { expenseField } from "@/assets/commanInterface/ComonInterface";
 import ExpensesTable from "../ExpensesTable";
-export function ExpandableCardDemo({ field }: { field: expenseField[] }) {
+export function ExpandableCardDemo({
+  field,
+  handleDeleteField,
+}: {
+  field: expenseField[];
+  handleDeleteField: void;
+}) {
   const [active, setActive] = useState<expenseField | number | boolean | null>(
     null
   );
@@ -107,8 +113,8 @@ export function ExpandableCardDemo({ field }: { field: expenseField[] }) {
                 <div className="pt-4 relative px-4">
                   <ExpensesTable field={active} key={active._id} />
                 </div>
-                {/* <div className="pt-4 relative px-4">
-                  <motion.div
+                {/* <div className="pt-4 relative px-4"> */}
+                  {/* <motion.div
                     layout
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -118,8 +124,14 @@ export function ExpandableCardDemo({ field }: { field: expenseField[] }) {
                     {typeof active.content === "function"
                       ? active.content()
                       : active.content}
-                  </motion.div>
-                </div> */}
+                  </motion.div> */}
+                  {/* <button
+                    className="text-white px-4 cursor-pointer outline-none"
+                    onClick={() => handleDeleteField(active._id)}
+                  >
+                    Delete Field
+                  </button> */}
+                {/* </div> */}
               </div>
             </motion.div>
           </div>

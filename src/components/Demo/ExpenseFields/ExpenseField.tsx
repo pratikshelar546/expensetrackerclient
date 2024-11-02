@@ -52,7 +52,8 @@ const ExpenseField = () => {
   return (
     <>
       <AddFieldModal />
-      <ExpandableCardDemo field={fieldId} />
+      <ExpandableCardDemo field={fieldId} handleDeleteField = {handleDelete} />
+
       {/* {fieldId &&
         fieldId.map((feild) => (
           <div
