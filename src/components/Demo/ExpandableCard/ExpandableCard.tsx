@@ -15,6 +15,7 @@ export function ExpandableCardDemo({
   const [active, setActive] = useState<expenseField | number | boolean | null>(
     null
   );
+  const [hoveredIndex, setHoverIndex] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
 
@@ -97,48 +98,70 @@ export function ExpandableCardDemo({
           </div>
         ) : null}
       </AnimatePresence>
-      <ul className=" dark max-w-3xl mx-auto w-full gap-4">
-        {field?.map((card) => (
-          <>
+      <ul className=" dark max-w-3xl mx-auto w-full gap-4 grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2  py-10">
+        {field?.map((card, idx) => (
+          <div key={idx}>
             <motion.div
+              onMouseEnter={() => setHoverIndex(idx)}
+              onMouseLeave={() => setHoverIndex(null)}
               layoutId={`card-${card._id}-${card._id}`}
               key={`card-${card._id}-${card._id}`}
               onClick={() => setActive(card)}
-              className="dark p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
+              className=" relative group  block p-2 h-full w-full "
             >
-              <div className="flex gap-4 flex-col md:flex-row ">
-                <div className="">
-                  <motion.h3
-                    layoutId={`title-${card.fieldName}-${card._id}`}
-                    className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
-                  >
-                    Field Name: {card.fieldName}
-                  </motion.h3>
-                  <motion.p
-                    layoutId={`description-${card.RecivedAmount}-${card._id}`}
-                    className="dark text-neutral-600 dark:text-neutral-400 text-center md:text-left"
-                  >
-                    Recived Amount: {card?.RecivedAmount}
-                  </motion.p>
-                  {card?.balance && (
-                    <motion.p
-                      layoutId={`description-${card.balance}-${card._id}`}
-                      className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
+              <div className="dark p-4 flex flex-col md:flex-row justify-between items-center rounded-xl cursor-pointer relative bg-slate-950 z-20 border dark:border-white/[0.2] hover:border-slate-800 h-full">
+                <div className="flex gap-4 flex-col md:flex-row">
+                  <div>
+                    <motion.h3
+                      layoutId={`title-${card.fieldName}-${card._id}`}
+                      className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
                     >
-                      balance : {card.balance}
+                      Field Name: {card.fieldName}
+                    </motion.h3>
+                    <motion.p
+                      layoutId={`description-${card.RecivedAmount}-${card._id}`}
+                      className="dark text-neutral-600 dark:text-neutral-400 text-center md:text-left"
+                    >
+                      Recived Amount: {card?.RecivedAmount}
                     </motion.p>
-                  )}
+                    {card?.balance && (
+                      <motion.p
+                        layoutId={`description-${card.balance}-${card._id}`}
+                        className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
+                      >
+                        balance : {card.balance}
+                      </motion.p>
+                    )}
+                  </div>
                 </div>
+                <motion.button
+                  layoutId={`button-${card._id}-${card._id}`}
+                  className="dark px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-slate-900 hover:border hover:border-slate-700 hover:text-white text-black mt-4 md:mt-0 z-10"
+                >
+                  Edit
+                </motion.button>
               </div>
-              <motion.button
-                layoutId={`button-${card._id}-${card._id}`}
-                className="dark px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-green-500 hover:text-white text-black mt-4 md:mt-0"
-              >
-                Edit
-              </motion.button>
+
+              <AnimatePresence>
+                {hoveredIndex === idx && (
+                  <motion.span
+                    className="absolute inset-0 h-full w-full bg-neutral-200 dark:bg-slate-800/[0.8] block  rounded-2xl"
+                    layoutId="hoverBackground"
+                    initial={{ opacity: 0 }}
+                    animate={{
+                      opacity: 1,
+                      transition: { duration: 0.15 },
+                    }}
+                    exit={{
+                      opacity: 0,
+                      transition: { duration: 0.15, delay: 0.2 },
+                    }}
+                  />
+                )}
+              </AnimatePresence>
             </motion.div>
-            <div className="dark bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-4 h-[1px] w-full" />
-          </>
+            <div className="dark bg-gradient-to-r from-transparent block sm:hidden via-neutral-300 dark:via-neutral-700 to-transparent my-2 h-[1px] w-full" />
+          </div>
         ))}
       </ul>
     </>

@@ -4,19 +4,23 @@ import { Label } from "../../../CommonComponent/UI/Label";
 import { Input } from "../../../CommonComponent/UI/Input";
 import { cn } from "@/lib/utils";
 import { useDispatch } from "react-redux";
-import { createField } from "@/Redux/Slices/FieldSlice";
+import { createField, getField } from "@/Redux/Slices/FieldSlice";
 import { addField } from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../../Hooks";
-import { ModalClose } from "@/CommonComponent/UI/animated-modal";
+import { ModalClose, useModal } from "@/CommonComponent/UI/animated-modal";
 
-export function AddFieldForm() {
+export function AddFieldForm({
+  fetchFieldData,
+}: {
+  fetchFieldData: () => Promise<void>;
+}) {
   const dispatch = useAppDispatch();
   const [field, setField] = useState<addField>({
     fieldName: "",
     RecivedAmount: "",
   });
   const [validate, setValidate] = useState(true);
-
+  const { setOpen, open } = useModal();
   const handleOnChange = (e: any) => {
     const { name, value } = e.target;
     setField((prev) => ({ ...prev, [name]: value }));
@@ -25,16 +29,16 @@ export function AddFieldForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (field.fieldName === "") {
-      setValidate(false);
-    } else {
       setValidate(true);
+    } else {
+      setOpen(false);
       await dispatch(createField(field));
-      setField({ fieldName: "",
-        RecivedAmount: "",})
+      setField({ fieldName: "", RecivedAmount: "" });
+      await fetchFieldData();
     }
   };
 
-  console.log(validate);
+  console.log(open);
 
   return (
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">
@@ -50,7 +54,6 @@ export function AddFieldForm() {
           <Label htmlFor="fieldName">Field Name</Label>
           <Input
             id="fieldName"
-            
             name="fieldName"
             placeholder="Field 1"
             type="text"

@@ -69,18 +69,17 @@ export const ModalClose = ({
   className?: string;
   validate: boolean;
 }) => {
-  console.log(!validate);
-  
   const { setOpen } = useModal();
   return (
     <button
+      type="submit"
       className={cn(
         "dark px-4 py-2 rounded-md text-black dark:text-white text-center relative",
         className
       )}
-      onClick={() => {
-        !validate ? setOpen(false) : setOpen(true);
-      }}
+      // onClick={() => {
+      //   !validate ? setOpen(false) : setOpen(true);
+      // }}
     >
       {children}
     </button>

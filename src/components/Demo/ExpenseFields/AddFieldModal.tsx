@@ -8,7 +8,11 @@ import {
 } from "../../../CommonComponent/UI/animated-modal";
 import { AddFieldForm } from "./AddFieldForm";
 
-export function AddFieldModal() {
+export function AddFieldModal({
+  fetchFieldData,
+}: {
+  fetchFieldData: () => Promise<void>;
+}) {
   return (
     <div className="dark flex items-center justify-center">
       <Modal>
@@ -23,7 +27,7 @@ export function AddFieldModal() {
         <ModalBody>
           <ModalContent>
             <div className="py-3 flex flex-col gap-x-4 gap-y-2 items-start justify-start max-w-lg mx-auto">
-              <AddFieldForm />
+              <AddFieldForm fetchFieldData={fetchFieldData} />
             </div>
           </ModalContent>
         </ModalBody>
