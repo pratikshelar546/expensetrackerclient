@@ -17,7 +17,7 @@ export function Header() {
   getSessionUtil();
 
   return (
-    <div className="flex justify-center items-center top-0 z-[1] fixed w-full">
+    <header className="flex justify-center items-center top-0 z-[1] fixed w-full">
       <motion.div
         initial={{ scale: 4, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -37,6 +37,6 @@ export function Header() {
           <SignInBtn />
         </div>
       </motion.div>
-    </div>
+    </header>
   );
 }

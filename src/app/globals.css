@@ -65,6 +65,33 @@
     --ring: 212.7 26.8% 83.9%;
   } */
 }
+
+@layer utilities {
+  .imggradiant {
+    position: absolute; /* Make sure the gradient is positioned correctly */
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    pointer-events: none; /* Prevent interaction with the gradient */
+    background: linear-gradient(
+        to right,
+        #020617,
+        /* Solid color at the start */ rgba(2, 6, 23, 0.5) 10%,
+        /* 50% opacity at 10% */ rgba(2, 6, 23, 0.2) 85%,
+        /* Light transparency at 85% */ rgba(2, 6, 23, 0.2) 95%,
+        /* Maintain transparency */ #020617 /* Solid color at the end */
+      ),
+      linear-gradient(
+        to bottom,
+        #020617,
+        /* Solid color at the top */ rgba(2, 6, 23, 0.7) 5%,
+        /* 70% opacity at 5% */ rgba(2, 6, 23, 0) 15%,
+        /* Fully transparent at 15% */ rgba(2, 6, 23, 0) 55%,
+        /* 70% opacity at 95% */ #020617 /* Solid color at the bottom */
+      );
+  }
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
