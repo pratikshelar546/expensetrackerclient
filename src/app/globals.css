@@ -76,19 +76,20 @@
     pointer-events: none; /* Prevent interaction with the gradient */
     background: linear-gradient(
         to right,
-        #020617,
-        /* Solid color at the start */ rgba(2, 6, 23, 0.5) 10%,
-        /* 50% opacity at 10% */ rgba(2, 6, 23, 0.2) 85%,
-        /* Light transparency at 85% */ rgba(2, 6, 23, 0.2) 95%,
-        /* Maintain transparency */ #020617 /* Solid color at the end */
+        #000,
+        #00000080 10%,
+        #0003 85%,
+        #0003 95%,
+        #000
       ),
       linear-gradient(
         to bottom,
-        #020617,
-        /* Solid color at the top */ rgba(2, 6, 23, 0.7) 5%,
-        /* 70% opacity at 5% */ rgba(2, 6, 23, 0) 15%,
-        /* Fully transparent at 15% */ rgba(2, 6, 23, 0) 55%,
-        /* 70% opacity at 95% */ #020617 /* Solid color at the bottom */
+        #000,
+        #000000b3 5%,
+        #0000 15%,
+        #0000 85%,
+        #000000b3 95%,
+        #000
       );
   }
 }

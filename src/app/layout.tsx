@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-mono bg-slate-950`}>
+      <body className={`${inter.variable} font-mono bg-black`}>
         <NextAuthProvider>
           <Header />
           {children}
