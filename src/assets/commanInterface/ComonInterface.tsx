@@ -28,15 +28,18 @@ export interface session {
 }
 
 export interface expenseField {
-  map(arg0: (card: any, index: any) => import("react").JSX.Element): import("react").ReactNode;
+  map(
+    arg0: (card: any, index: any) => import("react").JSX.Element
+  ): import("react").ReactNode;
   _id: string;
   fieldId: string;
   fieldName?: string;
   RecivedAmount?: number | null;
-  balance? :number |null
+  balance?: number | null;
 }
 
 export interface addField {
   fieldName?: string;
   RecivedAmount?: string;
+  fieldType?: string;
 }

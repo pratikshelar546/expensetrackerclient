@@ -25,7 +25,7 @@ const MainPage = () => {
               initial={{ y: -50, x: -50, opacity: 0 }}
               animate={{ y: 0, x: 0, opacity: 1 }}
               transition={{ ease: "easeInOut", duration: 0.75 }}
-              className="text-5xl lg:text-6xl font-extrabold  px-4 text-left"
+              className="text-6xl lg:text-5xl font-extrabold  px-4 text-left"
             >
               Manage Your <span className="text-blue-400">expenses </span>
               Smartly.

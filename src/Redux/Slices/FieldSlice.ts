@@ -38,21 +38,26 @@ export const createField = createAsyncThunk(
   }
 );
 
-export const getField = createAsyncThunk("field/getField", async () => {
-  try {
-    const response = await axios({
-      method: "GET",
-      url: `${process.env.NEXT_PUBLIC_API_URL}field/`,
-      headers: {
-        Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
-      },
-    });
+export const getField = createAsyncThunk(
+  "field/getField",
+  async (fieldType?: string) => {
+    try {
+      const response = await axios({
+        method: "GET",
+        url: `${process.env.NEXT_PUBLIC_API_URL}field${
+          fieldType ? `?fieldType=${fieldType}` : "/"
+        }`,
+        headers: {
+          Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
+        },
+      });
 
-    return response.data.expenseField;
-  } catch (error: any) {
-    throw error.message;
+      return response.data.expenseField;
+    } catch (error: any) {
+      throw error.message;
+    }
   }
-});
+);
 
 export const deleteField = createAsyncThunk(
   "field/DeleteField",

@@ -8,6 +8,9 @@ import { createField, getField } from "@/Redux/Slices/FieldSlice";
 import { addField } from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../../Hooks";
 import { ModalClose, useModal } from "@/CommonComponent/UI/animated-modal";
+import { Dropdown } from "@/CommonComponent/UI/Dropdown";
+
+const fieldTypeOptions = [{ value: "Personal" }, { value: "Team" }];
 
 export function AddFieldForm({
   fetchFieldData,
@@ -18,6 +21,7 @@ export function AddFieldForm({
   const [field, setField] = useState<addField>({
     fieldName: "",
     RecivedAmount: "",
+    fieldType: "",
   });
   const [validate, setValidate] = useState(true);
   const { setOpen, open } = useModal();
@@ -38,7 +42,7 @@ export function AddFieldForm({
     }
   };
 
-  console.log(open);
+  console.log(field);
 
   return (
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">
@@ -59,6 +63,15 @@ export function AddFieldForm({
             type="text"
             value={field.fieldName ? field.fieldName : ""}
             onChange={(e) => handleOnChange(e)}
+          />
+        </LabelInputContainer>
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="fieldName">Field Type</Label>
+          <Dropdown
+            id="fieldName"
+            setField={setField}
+            options={fieldTypeOptions}
+            value={field.fieldName ? field.fieldName : ""}
           />
         </LabelInputContainer>
 
