@@ -5,6 +5,7 @@ import * as React from "react";
 import * as motion from "framer-motion/client";
 import SignInBtn from "./SignInBtn";
 import { getSession } from "next-auth/react";
+import { AnimatePresence } from "framer-motion";
 
 export function Header() {
   const router = useRouter();
@@ -17,6 +18,8 @@ export function Header() {
   getSessionUtil();
 
   return (
+    <AnimatePresence mode={'wait'}>
+
     <header className="flex justify-center items-center top-0 z-[1] fixed w-full">
       <motion.div
         initial={{ scale: 4, opacity: 0 }}
@@ -38,5 +41,7 @@ export function Header() {
         </div>
       </motion.div>
     </header>
+    </AnimatePresence>
+
   );
 }

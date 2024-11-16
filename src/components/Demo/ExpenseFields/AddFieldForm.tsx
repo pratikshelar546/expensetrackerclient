@@ -65,15 +65,31 @@ export function AddFieldForm({
             onChange={(e) => handleOnChange(e)}
           />
         </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="fieldName">Field Type</Label>
-          <Dropdown
-            id="fieldName"
-            setField={setField}
-            options={fieldTypeOptions}
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="fieldName">Field Type</Label>
+            <Dropdown
+              id="fieldName"
+              setField={setField}
+              options={fieldTypeOptions}
+              value={field.fieldName ? field.fieldName : ""}
+            />
+          </LabelInputContainer>
+        </div>
+        {field.fieldType === "Team" && <div>
+          <LabelInputContainer className="mb-4">
+          <Label htmlFor="addmember">Add Team Member</Label>
+          <Label htmlFor="addmember" className=" text-xs">Mention Email id of team member which you want to add</Label>
+          <Input
+            id="email"
+            name="addmember"
+            placeholder="member@xyz.com"
+            type="email"
             value={field.fieldName ? field.fieldName : ""}
+            onChange={(e) => handleOnChange(e)}
           />
         </LabelInputContainer>
+          </div>}
 
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
           <LabelInputContainer>

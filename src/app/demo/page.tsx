@@ -5,13 +5,19 @@ import React, { Suspense } from "react";
 const DemoPage = () => {
   return (
     <>
-      <Suspense fallback={<p>Loading Main page...</p>}>
-        {/* <DynamicThemeProvider> */}
+      {/* <DynamicThemeProvider> */}
+      {/* <Suspense
+        fallback={
+          <p className="text-red-400 w-screen h-screen bg-white">
+            Loading Main page...
+          </p>
+        }
+      > */}
         <CustomProvider>
           <MainDemoPage />
         </CustomProvider>
-        {/* </DynamicThemeProvider> */}
-      </Suspense>
+      {/* </Suspense> */}
+      {/* </DynamicThemeProvider> */}
     </>
   );
 };

@@ -1,3 +1,4 @@
+"use client";
 import { expenseField } from "@/assets/commanInterface/ComonInterface";
 import { createField, deleteField, getField } from "@/Redux/Slices/FieldSlice";
 import React, { useEffect, useState } from "react";
@@ -26,7 +27,6 @@ const ExpenseField = () => {
   }, []);
 
   const toggleOpen = (id: string) => {
-    console.log("trigger");
 
     if (isOpen === id) {
       setIsOpen(null);
@@ -46,8 +46,6 @@ const ExpenseField = () => {
 
     await fetchFieldData();
   };
-
-  console.log();
 
   return (
     <>
