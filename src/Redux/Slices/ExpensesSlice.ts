@@ -11,6 +11,11 @@ interface updateExpensePayload {
   fieldId?: String;
 }
 
+let token = null;
+if (typeof window !== "undefined") {
+  token = localStorage.getItem("token");
+}
+
 export const getAllExpenses = createAsyncThunk(
   "expenses/getExpenses",
   async (id: string) => {
@@ -33,8 +38,11 @@ export const addExpense = createAsyncThunk(
     try {
       const response = await axios({
         method: "POST",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/${id}/addexpense`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}field/add-expense/${id}`,
         data,
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
       });
       return response.data;
     } catch (error) {
@@ -87,7 +95,6 @@ const initialState: expensesIntitalState = {
   status: "idle",
   error: null,
 };
-
 
 const expenseSlice = createSlice({
   name: "expenses",

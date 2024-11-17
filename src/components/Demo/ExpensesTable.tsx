@@ -27,7 +27,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-import { updateField } from "@/Redux/Slices/FieldSlice";
+import { getFieldById, updateField } from "@/Redux/Slices/FieldSlice";
 import MobileExpenseSection from "./ExpenseFields/MobileExpenseSection";
 import useCheckDeviceView from "@/Hooks/useDeviceCheck";
 
@@ -53,7 +53,13 @@ export default function ExpensesTable({
 
   // fetch all expenses for all the field
   const fetchAllExpenses = async (fieldId: string) => {
-    const response = await dispatch(getAllExpenses(fieldId));
+    const response = await dispatch(getFieldById(fieldId));
+    console.log(response.payload);
+    
+    if (getFieldById.fulfilled.match(response)) {
+      setRow(response.payload.field.expenses as tableRow[]);
+    }
+    
     if (getAllExpenses.fulfilled.match(response)) {
       setRow(response.payload.expensesList as tableRow[]);
     }
@@ -99,6 +105,8 @@ export default function ExpensesTable({
       const newRow = row.find((row) => row._id === id);
       if (newRow) {
         const { _id, ...rest } = newRow;
+        console.log("here");
+
         await dispatch(
           addExpense({
             data: rest,
@@ -116,11 +124,6 @@ export default function ExpensesTable({
         fetchAllExpenses(field._id);
       }
     }
-    const newTotal = row.reduce((sum, { price = 0 }) => sum + price, 0);
-    const newBalance = (RecivedAmount ?? 0) - newTotal;
-
-    const updatedField = { ...field, balance: newBalance };
-    await dispatch(updateField({ data: updatedField, id: field._id }));
     setEditableRow("");
   };
 
@@ -159,6 +162,8 @@ export default function ExpensesTable({
       color: "white",
     },
   };
+
+  console.log(field);
 
   return (
     <>

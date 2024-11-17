@@ -96,6 +96,25 @@ export const updateField = createAsyncThunk(
   }
 );
 
+export const getFieldById = createAsyncThunk(
+  "field/getFieldById",
+  async (id: string) => {
+    try {
+      const response = await axios({
+        method: "GET",
+        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
 interface fieldInitialState {
   expensesField: expenseField | null;
   allField: expenseField[];
@@ -171,6 +190,20 @@ const fieldSlice = createSlice({
       .addCase(updateField.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to add expense";
+      })
+      .addCase(getFieldById.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(
+        getFieldById.fulfilled,
+        (state, action: PayloadAction<expenseField[]>) => {
+          state.status = "succeeded";
+          state.allField = action.payload;
+        }
+      )
+      .addCase(getFieldById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to get field data";
       });
   },
 });

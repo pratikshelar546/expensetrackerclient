@@ -11,8 +11,9 @@ export interface DropdownProps
 
 const Dropdown = React.forwardRef<HTMLInputElement, DropdownProps>(
   ({ className, options, setField, ...props }, ref) => {
-    const radius = 100; // change this to increase the rdaius of the hover effect
+    const radius = 90; // change this to increase the rdaius of the hover effect
     const [visible, setVisible] = React.useState(false);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
 
     let mouseX = useMotionValue(0);
     let mouseY = useMotionValue(0);
@@ -32,8 +33,26 @@ const Dropdown = React.forwardRef<HTMLInputElement, DropdownProps>(
       setSelected(value);
       setIsOpen(false);
     };
+
+    React.useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        // Check if dropdownRef.current is not null and the clicked element is outside of it
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setIsOpen(false);
+        }
+      };
+    
+      document.addEventListener("mousedown", handleClickOutside);
+    
+      // Cleanup listener when component unmounts
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+
     return (
       <motion.div
+      ref={dropdownRef}
         style={{
           background: useMotionTemplate`
         radial-gradient(
@@ -85,7 +104,7 @@ const Dropdown = React.forwardRef<HTMLInputElement, DropdownProps>(
           {isOpen && (
             <motion.ul
               initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: -1 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ ease: "easeInOut", duration: 0.25 }}
               className="absolute z-10 w-full bg-gray-50 mt-1 dark:bg-zinc-800 text-black dark:text-white rounded-md shadow-lg max-h-60 overflow-auto"
