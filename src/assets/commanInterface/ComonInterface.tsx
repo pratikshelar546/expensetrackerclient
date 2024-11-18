@@ -28,13 +28,10 @@ export interface session {
 }
 
 export interface expenseField {
-  map(
-    arg0: (card: any, index: any) => import("react").JSX.Element
-  ): import("react").ReactNode;
   _id: string;
   fieldId: string;
   fieldName?: string;
-  RecivedAmount?: number | null;
+  RecivedAmount: number;
   balance?: number | null;
 }
 

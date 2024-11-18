@@ -27,47 +27,56 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-import { getFieldById, updateField } from "@/Redux/Slices/FieldSlice";
+import {
+  deleteField,
+  getFieldById,
+  updateField,
+} from "@/Redux/Slices/FieldSlice";
 import MobileExpenseSection from "./ExpenseFields/MobileExpenseSection";
 import useCheckDeviceView from "@/Hooks/useDeviceCheck";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const tableCellData = ["Date", "Category", "Description", "Price", "action"];
 
-export default function ExpensesTable({
-  field,
-  handleDeleteField,
-  setActive,
-}: {
-  field: expenseField;
-  handleDeleteField: (id: string) => Promise<void>;
-  setActive: Dispatch<SetStateAction<number | boolean | expenseField | null>>;
-}) {
+export default function ExpensesTable({ id }: { id: string }) {
   const dispatch = useAppDispatch();
-  const { RecivedAmount } = field;
+  const router = useRouter();
   const [row, setRow] = useState<tableRow[]>([]);
   const [editableRow, setEditableRow] = useState<string>("");
   const isMobile = useCheckDeviceView();
-
-  const totalAmount = row?.reduce((sum, { price = 0 }) => sum + price, 0);
-  const fieldBalance = (RecivedAmount ?? 0) - totalAmount;
+  const [field, setField] = useState<expenseField>({
+    _id: "",
+    fieldId: "",
+    fieldName: "",
+    RecivedAmount: 0,
+    balance: null,
+  });
 
   // fetch all expenses for all the field
   const fetchAllExpenses = async (fieldId: string) => {
     const response = await dispatch(getFieldById(fieldId));
-    console.log(response.payload);
-    
+
     if (getFieldById.fulfilled.match(response)) {
+      setField(response.payload.field);
       setRow(response.payload.field.expenses as tableRow[]);
     }
-    
+
     if (getAllExpenses.fulfilled.match(response)) {
       setRow(response.payload.expensesList as tableRow[]);
     }
   };
 
   useEffect(() => {
-    fetchAllExpenses(field._id);
+    fetchAllExpenses(id[0]);
   }, []);
+
+  const totalAmount = row?.reduce((sum, { price = 0 }) => sum + price, 0);
+  const fieldBalance = (field.RecivedAmount ?? 0) - totalAmount;
+
+  const handleDeleteField = async (id: string) => {
+    await dispatch(deleteField(id));
+    router.push("/demo");
+  };
 
   const handleAddExpenseClick = () => {
     const hasNewRow = row.some((rows) => rows._id === "newRow");
@@ -141,7 +150,7 @@ export default function ExpensesTable({
       const newTotalAmount = row
         .filter((r) => r._id !== id)
         .reduce((sum, { price = 0 }) => sum + price, 0);
-      const newBalance = (RecivedAmount ?? 0) - newTotalAmount;
+      const newBalance = (field.RecivedAmount ?? 0) - newTotalAmount;
 
       const updatedField = { ...field, balance: newBalance };
       await dispatch(updateField({ data: updatedField, id: field._id }));
@@ -163,7 +172,6 @@ export default function ExpensesTable({
     },
   };
 
-  console.log(field);
 
   return (
     <>
@@ -358,14 +366,16 @@ export default function ExpensesTable({
       )}
 
       <div className="p-3 w-full flex justify-between items-center bottom-0 relative">
-        <h1 className="text-white border border-gray-400 py-2 px-4   rounded-xl relative right-0">
-          {fieldBalance ? `Balance : ${fieldBalance}` : null}
-        </h1>
+        {fieldBalance && (
+          <h1 className="text-white border border-gray-400 py-2 px-4   rounded-xl relative right-0">
+            Balance : {fieldBalance}
+          </h1>
+        )}
         <button
           className=" cursor-pointer outline-none text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0 "
           onClick={() => {
             handleDeleteField(field._id);
-            setActive(false);
+            // setActive(false);
           }}
         >
           Delete Field

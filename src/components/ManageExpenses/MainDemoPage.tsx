@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import React from "react";
 // import ExpensesTable from "./ExpensesTable";
-import ExpenseField from "./ExpenseFields/ExpenseField";
-import { ExpandableCardDemo } from "./ExpandableCard/ExpandableCard";
+import ExpenseField from "../ManageExpenses/ExpenseFields/ExpenseField";
+import { ExpandableCardDemo } from "../ManageExpenses/ExpandableCard/ExpandableCard";
 
 const MainDemoPage = () => {
   return (

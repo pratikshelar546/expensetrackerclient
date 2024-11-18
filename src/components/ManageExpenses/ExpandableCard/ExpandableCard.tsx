@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
 import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "@/Hooks/use-outside-click";
 import { expenseField } from "@/assets/commanInterface/ComonInterface";
 import ExpensesTable from "../ExpensesTable";
+import { useRouter } from "next/navigation";
 
 export function ExpandableCardDemo({
   field,
@@ -19,6 +19,7 @@ export function ExpandableCardDemo({
   const [hoveredIndex, setHoverIndex] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
+  const router = useRouter();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -42,7 +43,9 @@ export function ExpandableCardDemo({
   //   TODO update balance in field section one it updated in expenses section
   //  TODO Make table responsive
 
-
+  const addNewMember = (id: string) => {
+    console.log(id);
+  };
   return (
     <>
       <AnimatePresence>
@@ -79,22 +82,31 @@ export function ExpandableCardDemo({
                       Recived Amount : {active.RecivedAmount}
                     </motion.p>
                   </div>
-                  <motion.button
+                  <motion.div
+                    className="flex gap-2"
                     layoutId={`button-${active._id}-${active._id}`}
-                    className="rounded-full h-6 w-6 text-sm flex items-center justify-center font-bold bg-white text-black"
-                    onClick={() => setActive(null)}
                   >
-                    <CloseIcon />
-                  </motion.button>
+                    <motion.button
+                      className="rounded-full h-7 w-7 text-sm flex items-center justify-center font-bold hover:bg-white text-black"
+                      onClick={() => addNewMember(active._id)}
+                    >
+                      <AddUser />
+                    </motion.button>
+                    <motion.button
+                      className="rounded-full h-7 w-7 text-sm flex items-center justify-center font-bold bg-white text-black"
+                      onClick={() => setActive(null)}
+                    >
+                      <CloseIcon />
+                    </motion.button>
+                  </motion.div>
                 </div>
-
                 <div className="pt-4 relative px-4">
-                  <ExpensesTable
+                  {/* <ExpensesTable
                     field={active}
                     key={active._id}
                     handleDeleteField={handleDeleteField}
                     setActive={setActive}
-                  />
+                  /> */}
                 </div>
               </div>
             </motion.div>
@@ -109,7 +121,7 @@ export function ExpandableCardDemo({
               onMouseLeave={() => setHoverIndex(null)}
               layoutId={`card-${card._id}-${card._id}`}
               key={`card-${card._id}-${card._id}`}
-              onClick={() => setActive(card)}
+              onClick={() => router.push(`/expofield/${card._id}`)}
               className=" relative group  block p-2 h-full w-full "
             >
               <div className="dark p-4 flex flex-col md:flex-row justify-between items-center rounded-xl cursor-pointer relative bg-slate-950 z-20 border dark:border-white/[0.2] hover:border-slate-800 h-full">
@@ -194,11 +206,34 @@ export const CloseIcon = () => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-black"
+      className="h-5 w-5 text-black"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M18 6l-12 12" />
       <path d="M6 6l12 12" />
     </motion.svg>
+  );
+};
+
+export const AddUser = () => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <svg
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke={hovered ? "black" : "white"}
+      className="size-7  p-1 "
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"
+      />
+    </svg>
   );
 };

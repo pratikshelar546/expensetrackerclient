@@ -27,7 +27,6 @@ const ExpenseField = () => {
   }, []);
 
   const toggleOpen = (id: string) => {
-
     if (isOpen === id) {
       setIsOpen(null);
     } else {
