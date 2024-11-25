@@ -8,7 +8,7 @@ export const signup = createAsyncThunk(
   async (data: userData) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}user/auth`,
+        `${process.env.API_URL}user/auth`,
         data
       );
 

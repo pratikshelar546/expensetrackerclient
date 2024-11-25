@@ -24,7 +24,7 @@ export const createField = createAsyncThunk(
     try {
       const response = await axios({
         method: "POST",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/createField`,
+        url: `${process.env.API_URL}field/createField`,
         data,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
@@ -44,7 +44,7 @@ export const getField = createAsyncThunk(
     try {
       const response = await axios({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field${
+        url: `${process.env.API_URL}field${
           fieldType ? `?fieldType=${fieldType}` : "/"
         }`,
         headers: {
@@ -65,7 +65,7 @@ export const deleteField = createAsyncThunk(
     try {
       const response = await axios({
         method: "DELETE",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}`,
+        url: `${process.env.API_URL}field/${id}`,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
         },
@@ -83,7 +83,7 @@ export const updateField = createAsyncThunk(
     try {
       const response = await axios({
         method: "PUT",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}/update`,
+        url: `${process.env.API_URL}field/${id}/update`,
         data,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
@@ -102,7 +102,7 @@ export const getFieldById = createAsyncThunk(
     try {
       const response = await axios({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}`,
+        url: `${process.env.API_URL}field/${id}`,
         headers: {
           Authorization: `Bearer ${token}`,
         },

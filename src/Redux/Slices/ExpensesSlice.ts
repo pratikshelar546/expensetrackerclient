@@ -22,7 +22,7 @@ export const getAllExpenses = createAsyncThunk(
     try {
       const response = await axios<{ expensesList: tableRow[] }>({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/${id}`,
+        url: `${process.env.API_URL}expenses/${id}`,
       });
 
       return response.data;
@@ -38,10 +38,10 @@ export const addExpense = createAsyncThunk(
     try {
       const response = await axios({
         method: "POST",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/add-expense/${id}`,
+        url: `${process.env.API_URL}field/add-expense/${id}`,
         data,
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
       });
       return response.data;
@@ -57,7 +57,7 @@ export const updateExpense = createAsyncThunk(
     try {
       const response = await axios({
         method: "PUT",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/udpateExpense/${id}`,
+        url: `${process.env.API_URL}expenses/udpateExpense/${id}`,
         data,
       });
       return response.data;
@@ -73,7 +73,7 @@ export const deleteExpenses = createAsyncThunk(
     try {
       const response = await axios({
         method: "DELETE",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/deleteExpense/${id}`,
+        url: `${process.env.API_URL}expenses/deleteExpense/${id}`,
       });
       return response.data;
     } catch (error) {

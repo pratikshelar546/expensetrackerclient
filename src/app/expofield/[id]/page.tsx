@@ -3,8 +3,7 @@ import CustomProvider from "@/CustomProvider/CustomProvider";
 import React from "react";
 
 const page = ({ params }: { params: { id: string } }) => {
-    console.log(params);
-    
+      
   return (
     <>
       <CustomProvider>

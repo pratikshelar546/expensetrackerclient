@@ -67,7 +67,7 @@ export default function ExpensesTable({ id }: { id: string }) {
   };
 
   useEffect(() => {
-    fetchAllExpenses(id[0]);
+    fetchAllExpenses(id);
   }, []);
 
   const totalAmount = row?.reduce((sum, { price = 0 }) => sum + price, 0);
@@ -171,7 +171,6 @@ export default function ExpensesTable({ id }: { id: string }) {
       color: "white",
     },
   };
-
 
   return (
     <>
