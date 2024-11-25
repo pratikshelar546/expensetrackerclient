@@ -5,7 +5,10 @@ import GoogleProvider from "next-auth/providers/google";
 
 const createToken = async (user: User) => {
   try {
-    const response = await axios.post(`${process.env.API_URL}user/auth`, user);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}user/auth`,
+      user
+    );
 
     return response.data.token;
   } catch (error: any) {
@@ -27,7 +30,7 @@ const authOptions: AuthOptions = {
     async signIn({ user, account }: { user: User; account: Account | null }) {
       if (account?.provider === "google") {
         try {
-          await axios.post(`${process.env.API_URL}user/auth`, user);
+          await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
         } catch (error: any) {
           console.log(error.message);
           return false;
