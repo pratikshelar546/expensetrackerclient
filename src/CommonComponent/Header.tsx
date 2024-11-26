@@ -25,14 +25,14 @@ export function Header() {
         initial={{ scale: 4, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ ease: "easeInOut", duration: 0.75 }}
-        className="flex w-full max-w-6xl text-white justify-between gap-5 items-center py-4 px-8  text-lg"
+        className="flex w-full max-w-6xl text-white justify-between md:gap-5 gap-2 items-center py-4 px-8 md:flex-row flex-col text-lg"
       >
         <div>
           <h3 onClick={() => router.push("/")} className=" cursor-pointer">
             ExpenseWise
           </h3>
         </div>
-        <div className="flex gap-10">
+        <div className="flex md:gap-10 gap-5">
           <h3>Documentation</h3>
           <h3 onClick={() => router.push("/demo")} className=" cursor-pointer">
             Demo

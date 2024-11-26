@@ -6,7 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   addExpense,
   deleteExpenses,
@@ -34,7 +34,7 @@ import {
 } from "@/Redux/Slices/FieldSlice";
 import MobileExpenseSection from "./ExpenseFields/MobileExpenseSection";
 import useCheckDeviceView from "@/Hooks/useDeviceCheck";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const tableCellData = ["Date", "Category", "Description", "Price", "action"];
 
@@ -178,10 +178,13 @@ export default function ExpensesTable({ id }: { id: string }) {
         <MobileExpenseSection
           row={row}
           setRow={setRow}
+          editableRow={editableRow}
           handleDeleteRow={handleDeleteRow}
           handleUpdateRow={handleUpdateRow}
+          handleEditRow={handleEditRow}
           fetchAllExpenses={fetchAllExpenses}
           field={field}
+          handleRowChange={handleRowChange}
         />
       ) : (
         <TableContainer
@@ -189,9 +192,8 @@ export default function ExpensesTable({ id }: { id: string }) {
           style={{
             backgroundColor: "transparent",
             color: "white",
-            padding: "1rem",
           }}
-          className="lg:max-h-[50vh] md:max-h-[65vh] max-h-[72vh] h-full md:block hidden"
+          className="lg:max-h-[50vh] md:max-h-[65vh] max-h-[72vh] h-full md:block hidden mt-20 px-10"
         >
           <Table size="small">
             <TableHead>
@@ -364,7 +366,7 @@ export default function ExpensesTable({ id }: { id: string }) {
         </TableContainer>
       )}
 
-      <div className="p-3 w-full flex justify-between items-center bottom-0 relative">
+      <div className="md:px-12 px-2 w-full flex justify-between items-center bottom-0 relative  gap-3">
         {fieldBalance && (
           <h1 className="text-white border border-gray-400 py-2 px-4   rounded-xl relative right-0">
             Balance : {fieldBalance}
