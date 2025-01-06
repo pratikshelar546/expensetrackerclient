@@ -1,53 +1,67 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import * as motion from "framer-motion/client";
 import Image from "next/image";
 import sideImage from "../assets/icons/image.png";
+import { Button } from "@/CommonComponent/UI/moving-border";
 const MainPage = () => {
   return (
     <main className="w-full min-h-screen flex flex-col items-center overflow-x-hidden overflow-y-hidden">
- 
       <section className="relative w-full h-full min-h-[calc(100vh-3.6rem)] flex flex-col items-center justify-start border-b border-blue-500/50 mt-14 max-w-6xl">
-
-        <div className="-z-10 absolute left-[calc(20%)] w-[100%] h-[calc(100vh-12rem)] max-w-6xl">
-          <div className="absolute inset-0 flex justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            duration: 1.5, // Longer duration for a smoother fade
+            ease: "easeInOut", // Smooth easing for fade effect
+            delay: 1,
+          }}
+          className="-z-10 absolute w-full  h-[calc(100vh-3rem)]"
+        >
+          <motion.div className="absolute inset-0 flex h-full justify-center items-center">
             <Image
               src={sideImage}
               alt="new"
-              className=" absolute inset-0 h-full w-4/5 object-left-top object-contain"
-            ></Image>
-          </div>
-          <div className="absolute inset-0 imggradiant w-4/5"></div>
-        </div>
+              className=" absolute inset-0 h-[calc(100vh-3rem)] w-full opacity-30"
+            />
+          </motion.div>
+          <div className="absolute inset-0 imggradiant h-full w-full"></div>
+        </motion.div>
         <div className="text-white max-h-[calc(100vh-16rem)] top-5 relative w-full grow px-4 mx-4 flex flex-col justify-center gap-6">
-          <div className="w-full max-w-2xl gap-5 flex flex-col">
+          <div className="w-full justify-center items-center gap-5 flex flex-col">
             <motion.h1
-              initial={{ y: -50, x: -50, opacity: 0 }}
-              animate={{ y: 0, x: 0, opacity: 1 }}
-              transition={{ ease: "easeInOut", duration: 0.75 }}
-              className="text-6xl lg:text-5xl font-extrabold  px-4 text-left"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              whileHover={{ scale:1.07 }}
+              transition={{ ease: [0.42, 0, 0.58, 1], duration: 0.5, delay: 1.2 }}
+              className="text-5xl lg:text-5xl font-extrabold  px-4 "
             >
               Manage Your <span className="text-blue-400">expenses </span>
               Smartly.
             </motion.h1>
             <motion.p
-              initial={{ y: -50, x: -50, opacity: 0 }}
-              animate={{ y: 0, x: 0, opacity: 1 }}
-              transition={{ ease: "easeInOut", duration: 0.75 }}
-              className="text-lg font-semibold text-left px-4"
-            > 
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ ease: "easeIn", duration: 0.5, delay: 0.6 }}
+              className="text-lg font-medium px-4 max-w-4xl text-center"
+            >
               Effortlessly manage daily expenses, collaborate with your team,
               and track monthly household budgets. Stay organized and in control
               of your finances with ease and efficiency.
             </motion.p>
-            <div className="flex gap-5 left-4 relative">
-              <button className="bg-blue-600 text-white px-3 pt-1 rounded-lg">
-                GET STARTED
-              </button>
+            <div className="flex gap-5 left-4 relative overflow-hidden">
+
+              <Button 
+                borderRadius="1.75rem"
+                className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
+              >
+                Get Started
+              </Button>
+             
             </div>
           </div>
         </div>
-       </section>
+      </section>
     </main>
   );
 };

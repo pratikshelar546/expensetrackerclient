@@ -22,9 +22,9 @@ export function Header() {
 
     <header className="flex justify-center items-center top-0 z-[1] fixed w-full">
       <motion.div
-        initial={{ scale: 4, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ ease: "easeInOut", duration: 0.75 }}
+        initial={{y:-70, opacity: 0 }}
+        animate={{ y: 1, opacity: 1 }}
+        transition={{ ease: "easeInOut", duration: 0.7, delay:1.4 }}
         className="flex w-full max-w-6xl text-white justify-between md:gap-5 gap-2 items-center py-4 px-8 md:flex-row flex-col text-lg"
       >
         <div>
