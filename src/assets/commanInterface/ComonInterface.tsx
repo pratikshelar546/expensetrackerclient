@@ -21,12 +21,6 @@ export interface userData {
   name: string;
 }
 
-export interface session {
-  user: User;
-  jwt: String;
-  expires: String;
-}
-
 export interface expenseField {
   _id: string;
   fieldId: string;

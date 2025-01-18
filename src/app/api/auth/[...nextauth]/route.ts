@@ -1,7 +1,21 @@
 import axios from "axios";
 import NextAuth, { Account, AuthOptions, Session, User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
+import { JWT } from "next-auth/jwt";
 import GoogleProvider from "next-auth/providers/google";
+
+
+export interface session extends Session {
+  user: {
+    name: string,
+    email: string,
+    userId: string,
+    token: string
+  }
+}
+interface token extends JWT {
+  jwtToken: string
+}
 
 const createToken = async (user: User) => {
   try {
@@ -27,10 +41,10 @@ const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }: { user: User; account: Account | null }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
+          return await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
         } catch (error: any) {
           console.log(error.message);
           return false;
@@ -39,10 +53,10 @@ const authOptions: AuthOptions = {
 
       return true;
     },
-    async jwt({ token, user }: { token: any; user: User }) {
-      if (user) {
+    async jwt({ token, user, account }) {
+      if (user && account) {
         try {
-          token.jwt = await createToken(user);
+          token.jwtToken = await createToken(user);
         } catch (error: any) {
           console.error("JWT Error:", error.message);
         }
@@ -51,9 +65,13 @@ const authOptions: AuthOptions = {
     },
 
     // Attach the JWT token to the session
-    async session({ session, token }: { session: any; token: any }) {
-      session.jwt = token.jwt;
-      return session;
+    session: async ({ session, token: token }) => {
+      const newSession: session = session as session;
+      if (newSession.user) {
+
+        newSession.user.token = token.jwtToken as string;
+      }
+      return newSession!;
     },
   },
 };

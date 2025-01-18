@@ -22,12 +22,12 @@ const MainPage = () => {
             <Image
               src={sideImage}
               alt="new"
-              className=" absolute inset-0 h-[calc(100vh-3rem)] w-full opacity-30"
+              className=" absolute inset-0 h-[calc(100vh-3rem)] w-full opacity-40"
             />
           </motion.div>
           <div className="absolute inset-0 imggradiant h-full w-full"></div>
         </motion.div>
-        <div className="text-white max-h-[calc(100vh-16rem)] top-5 relative w-full grow px-4 mx-4 flex flex-col justify-center gap-6">
+        <div className="text-white max-h-full items-center relative w-full grow px-4 mx-4 flex flex-col justify-center gap-6">
           <div className="w-full justify-center items-center gap-5 flex flex-col">
             <motion.h1
               initial={{ y: 30, opacity: 0 }}

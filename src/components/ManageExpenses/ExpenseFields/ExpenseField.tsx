@@ -6,8 +6,13 @@ import ExpensesTable from "../ExpensesTable";
 import { useAppDispatch } from "../../../../Hooks";
 import { AddFieldModal } from "./AddFieldModal";
 import { ExpandableCardDemo } from "../ExpandableCard/ExpandableCard";
+import { useSession } from "next-auth/react";
 
 const ExpenseField = () => {
+  
+
+  const sesson = useSession();
+  console.log(sesson,"session");
   const [fieldId, setFieldId] = useState<expenseField[]>([]);
   const [isOpen, setIsOpen] = useState<string | null>(null);
 

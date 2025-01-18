@@ -5,6 +5,8 @@ import {
 } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+
+
 let token = null;
 if (typeof window !== "undefined") {
   token = localStorage.getItem("token");
@@ -14,7 +16,7 @@ interface updateField {
   id: string;
 }
 
-console.log(token);
+console.log("this is redux token", token);
 
 export const createField = createAsyncThunk(
   "field/createField",
@@ -44,9 +46,8 @@ export const getField = createAsyncThunk(
     try {
       const response = await axios({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field${
-          fieldType ? `?fieldType=${fieldType}` : "/"
-        }`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}field${fieldType ? `?fieldType=${fieldType}` : "/"
+          }`,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
         },

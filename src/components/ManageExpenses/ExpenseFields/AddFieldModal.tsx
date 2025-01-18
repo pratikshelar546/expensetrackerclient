@@ -18,7 +18,7 @@ export function AddFieldModal({
       <Modal>
         <ModalTrigger className="dark bg-black justify-center group/modal-btn inline-flex h-12 animate-shimmer items-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,rgba(2,6,23,var(--tw-bg-opacity)),45%,#1e2631,55%,rgba(2,6,23,var(--tw-bg-opacity)))] bg-[length:200%_100%] bg-opacity-100 px-6 font-medium text-white transition-colors focus:outline-none mb-5">
           <span className="group-hover/modal-btn:translate-y-44 text-center transition duration-500">
-            Add Another field
+            Add Expense field
           </span>
           <div className="-translate-y-10 group-hover/modal-btn:translate-y-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">
             🚀

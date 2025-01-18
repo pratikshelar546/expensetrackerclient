@@ -9,6 +9,8 @@ import { addField } from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../../Hooks";
 import { ModalClose, useModal } from "@/CommonComponent/UI/animated-modal";
 import { Dropdown } from "@/CommonComponent/UI/Dropdown";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const fieldTypeOptions = [{ value: "Personal" }, { value: "Team" }];
 
@@ -18,6 +20,8 @@ export function AddFieldForm({
   fetchFieldData: () => Promise<void>;
 }) {
   const dispatch = useAppDispatch();
+  const { status } = useSession();
+  const route = useRouter();
   const [field, setField] = useState<addField>({
     fieldName: "",
     RecivedAmount: "",
@@ -30,11 +34,17 @@ export function AddFieldForm({
     setField((prev) => ({ ...prev, [name]: value }));
   };
 
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (field.fieldName === "") {
       setValidate(true);
     } else {
+      if (status === "unauthenticated") {
+        const dignin = await signIn("google")
+        console.log(dignin);
+
+      }
       setOpen(false);
       await dispatch(createField(field));
       setField({ fieldName: "", RecivedAmount: "" });
