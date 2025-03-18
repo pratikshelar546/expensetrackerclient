@@ -1,6 +1,6 @@
 import React from "react";
 import { createTheme, Theme as MuiTheme } from "@mui/material/styles";
-import { ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 
 type Children = {
   children: React.ReactNode;
@@ -22,24 +22,17 @@ declare module "@mui/material/styles" {
 }
 
 // Define your custom theme
-const theme: MuiTheme = createTheme({
+const darkTheme: MuiTheme = createTheme({
   palette: {
-    mode: "dark",
+    mode: 'dark',
   },
-  // components: {
-  //   MuiInputBase: {
-  //     styleOverrides: {
-  //       input: {
-  //         color: "white",
-  //         padding: "0 !important",
-  //       },
-  //     },
-  //   },
-  // },
 });
 
 const DynamicThemeProvider = ({ children }: Children) => {
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return <ThemeProvider theme={darkTheme}>
+    <CssBaseline />
+    {children}
+  </ThemeProvider>;
 };
 
 export default DynamicThemeProvider;

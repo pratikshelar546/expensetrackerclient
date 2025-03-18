@@ -20,7 +20,7 @@ export function AddFieldForm({
   fetchFieldData: () => Promise<void>;
 }) {
   const dispatch = useAppDispatch();
-  const { status } = useSession();
+  const { status, data: session } = useSession();
   const route = useRouter();
   const [field, setField] = useState<addField>({
     fieldName: "",
@@ -43,16 +43,15 @@ export function AddFieldForm({
       if (status === "unauthenticated") {
         const dignin = await signIn("google")
         console.log(dignin);
-
       }
+      if (session?.user?.token === null) return;
       setOpen(false);
-      await dispatch(createField(field));
+      await dispatch(createField({ data: field, token: session?.user?.token }));
       setField({ fieldName: "", RecivedAmount: "" });
       await fetchFieldData();
     }
   };
 
-  console.log(field);
 
   return (
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">

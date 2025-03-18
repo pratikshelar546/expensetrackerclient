@@ -11,11 +11,6 @@ export function Header() {
   const router = useRouter();
   const session = useSession();
 
-  const getSessionUtil = async () => {
-    if (session.status === "authenticated") localStorage.setItem("token", session?.data?.user?.token!);
-  };
-
-  getSessionUtil();
 
   return (
     <SessionProvider>

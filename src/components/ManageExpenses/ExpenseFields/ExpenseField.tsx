@@ -9,17 +9,17 @@ import { ExpandableCardDemo } from "../ExpandableCard/ExpandableCard";
 import { useSession } from "next-auth/react";
 
 const ExpenseField = () => {
-  
 
-  const sesson = useSession();
-  console.log(sesson,"session");
+
+  const { data: session, status } = useSession();
+  const token = session?.user?.token || undefined;
   const [fieldId, setFieldId] = useState<expenseField[]>([]);
   const [isOpen, setIsOpen] = useState<string | null>(null);
 
   const dispatch = useAppDispatch();
 
   const fetchFieldData = async () => {
-    const fields = await dispatch(getField());
+    const fields = await dispatch(getField({ token: token }));
 
     if (getField.fulfilled.match(fields)) {
       setFieldId(fields.payload);
@@ -28,8 +28,12 @@ const ExpenseField = () => {
 
   // function call for fetchfield
   useEffect(() => {
-    fetchFieldData();
-  }, []);
+    if (status !== "loading") {
+
+      fetchFieldData();
+    }
+
+  }, [token]);
 
   const toggleOpen = (id: string) => {
     if (isOpen === id) {
@@ -46,7 +50,7 @@ const ExpenseField = () => {
   }, [fieldId]);
 
   const handleDelete = async (id: string) => {
-    await dispatch(deleteField(id));
+    await dispatch(deleteField({ id, token: token }));
 
     await fetchFieldData();
   };

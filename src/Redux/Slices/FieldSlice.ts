@@ -7,20 +7,16 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 
-let token = null;
-if (typeof window !== "undefined") {
-  token = localStorage.getItem("token");
-}
+
 interface updateField {
   data: expenseField;
   id: string;
+  token?: string
 }
-
-console.log("this is redux token", token);
 
 export const createField = createAsyncThunk(
   "field/createField",
-  async (data: addField) => {
+  async ({ data, token }: { data: addField, token?: string }) => {
     console.log(data);
 
     try {
@@ -42,7 +38,7 @@ export const createField = createAsyncThunk(
 
 export const getField = createAsyncThunk(
   "field/getField",
-  async (fieldType?: string) => {
+  async ({ token, fieldType }: { fieldType?: string, token?: string }) => {
     try {
       const response = await axios({
         method: "GET",
@@ -62,7 +58,7 @@ export const getField = createAsyncThunk(
 
 export const deleteField = createAsyncThunk(
   "field/DeleteField",
-  async (id: String) => {
+  async ({ id, token }: { id: string, token?: string }) => {
     try {
       const response = await axios({
         method: "DELETE",
@@ -80,7 +76,7 @@ export const deleteField = createAsyncThunk(
 
 export const updateField = createAsyncThunk(
   "expenses/updateFields",
-  async ({ data, id }: updateField) => {
+  async ({ data, id, token }: updateField) => {
     try {
       const response = await axios({
         method: "PUT",
@@ -99,7 +95,7 @@ export const updateField = createAsyncThunk(
 
 export const getFieldById = createAsyncThunk(
   "field/getFieldById",
-  async (id: string) => {
+  async ({ id, token }: { id: string, token?: string }) => {
     try {
       const response = await axios({
         method: "GET",

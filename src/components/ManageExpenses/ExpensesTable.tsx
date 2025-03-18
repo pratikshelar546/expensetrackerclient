@@ -1,11 +1,4 @@
 "use client";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
 import {
   addExpense,
@@ -18,14 +11,14 @@ import {
   tableRow,
 } from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../Hooks";
-import { CiEdit } from "react-icons/ci";
-import { FaRegSave } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { CiEdit, CiReceipt } from "react-icons/ci";
+import { FaRegSave, FaTag } from "react-icons/fa";
+import { MdDelete, MdEmojiTransportation, MdFoodBank } from "react-icons/md";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { NativeSelect, Tab, TextField } from "@mui/material";
+import { InputAdornment, NativeSelect, Tab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import {
   deleteField,
@@ -35,8 +28,10 @@ import {
 import MobileExpenseSection from "./ExpenseFields/MobileExpenseSection";
 import useCheckDeviceView from "@/Hooks/useDeviceCheck";
 import { useRouter } from "next/navigation";
-
-const tableCellData = ["Date", "Category", "Description", "Price", "action"];
+import { useSession } from "next-auth/react";
+import useFormatDate from "@/Hooks/useFormatDate";
+import { motion } from 'framer-motion';
+import { IoFastFoodOutline } from "react-icons/io5";
 
 export default function ExpensesTable({ id }: { id: string }) {
   const dispatch = useAppDispatch();
@@ -51,10 +46,12 @@ export default function ExpensesTable({ id }: { id: string }) {
     RecivedAmount: 0,
     balance: null,
   });
+  const { data: session, status } = useSession();
+  const token = session?.user?.token || undefined
 
   // fetch all expenses for all the field
   const fetchAllExpenses = async (fieldId: string) => {
-    const response = await dispatch(getFieldById(fieldId));
+    const response = await dispatch(getFieldById({ id: fieldId, token: token }));
 
     if (getFieldById.fulfilled.match(response)) {
       setField(response.payload.field);
@@ -65,16 +62,21 @@ export default function ExpensesTable({ id }: { id: string }) {
       setRow(response.payload.expensesList as tableRow[]);
     }
   };
+  console.log(status);
+
 
   useEffect(() => {
-    fetchAllExpenses(id);
-  }, []);
+    if (status !== 'loading') {
+
+      fetchAllExpenses(id);
+    }
+  }, [token]);
 
   const totalAmount = row?.reduce((sum, { price = 0 }) => sum + price, 0);
   const fieldBalance = (field.RecivedAmount ?? 0) - totalAmount;
 
   const handleDeleteField = async (id: string) => {
-    await dispatch(deleteField(id));
+    await dispatch(deleteField({ id, token }));
     router.push("/demo");
   };
 
@@ -153,7 +155,7 @@ export default function ExpensesTable({ id }: { id: string }) {
       const newBalance = (field.RecivedAmount ?? 0) - newTotalAmount;
 
       const updatedField = { ...field, balance: newBalance };
-      await dispatch(updateField({ data: updatedField, id: field._id }));
+      await dispatch(updateField({ data: updatedField, id: field._id, token }));
     }
   };
 
@@ -161,233 +163,157 @@ export default function ExpensesTable({ id }: { id: string }) {
     "& .MuiInputBase-input": {
       color: "white",
       padding: "4px !important",
+      textAlign: "right",
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
-        border: "none",
       },
     },
     "& .MuiIconButton-root": {
       color: "white",
     },
   };
-
+  const darkMode = true
   return (
+
     <>
-      {isMobile ? (
-        <MobileExpenseSection
-          row={row}
-          setRow={setRow}
-          editableRow={editableRow}
-          handleDeleteRow={handleDeleteRow}
-          handleUpdateRow={handleUpdateRow}
-          handleEditRow={handleEditRow}
-          fetchAllExpenses={fetchAllExpenses}
-          field={field}
-          handleRowChange={handleRowChange}
-        />
-      ) : (
-        <TableContainer
-          component={Paper}
-          style={{
-            backgroundColor: "transparent",
-            color: "white",
-          }}
-          className="lg:max-h-[50vh] md:max-h-[65vh] max-h-[72vh] h-full md:block hidden mt-20 px-10"
-        >
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                {tableCellData.map((cell, index) => (
-                  <TableCell
-                    key={index}
-                    style={{ color: "white" }}
-                    align="center"
-                  >
-                    {cell}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {row.map((row) => {
-                const isEditable = row._id === editableRow;
+      {status !== 'authenticated' ? <>
 
+      </> :
+        <>
+          <div className="w-full flex justify-center items-center">
+
+            <div className="grid gap-6 grid-cols-1  md:grid-cols-2 lg:grid-cols-3 text-white top-16 relative w-full max-w-7xl px-4">
+              {row.map((expense) => {
+                const isEditable = expense._id === editableRow;
                 return (
-                  <TableRow key={row._id} hover>
-                    <TableCell
-                      width={180}
-                      align="center"
-                      style={{ color: "white" }}
-                    >
-                      {isEditable ? (
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            sx={textFieldStyle}
-                            value={dayjs(new Date(row.date))}
-                            onChange={(newValue) => {
-                              handleRowChange(row._id, "date", newValue);
-                            }}
-                            slotProps={{ textField: { fullWidth: true } }}
-                          />
-                        </LocalizationProvider>
-                      ) : (
-                        (row.date instanceof Date
-                          ? dayjs(row.date)
-                          : dayjs(row.date)
-                        ).format("YYYY-MM-DD")
-                      )}
-                    </TableCell>
+                  <motion.div
+                    key={expense._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className='rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg bg-neutral-900 hover:bg-neutral-950 '>
+                    <div className="flex flex-col space-y-4 justify-between h-full">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className={`p-3 ${darkMode ? 'bg-blue-500/20' : 'bg-blue-100'} rounded-full`}>
+                            <CiReceipt className={`w-6 h-6 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                          </div>
+                          <div>
+                            {isEditable ? <input
+                              value={expense.desc}
+                              onChange={(e) => handleRowChange(expense._id, "desc", e.target.value)}
+                              className="w-32 text-sm bg-transparent border-b border-gray-600 text-white outline-none"
+                            /> : <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                              {expense.desc}
+                            </h3>}
+                            <div className="flex items-center mt-1 space-x-2">
+                              {expense.category === 'Food' ? <IoFastFoodOutline className={`w-4 h-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} /> :expense.category === 'Transport'? <MdEmojiTransportation className={`w-4 h-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />:<FaTag className={`w-4 h-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />}
 
-                    <TableCell
-                      width={140}
-                      align="center"
-                      style={{ color: "white" }}
-                    >
-                      {isEditable ? (
-                        <NativeSelect
-                          name="category"
-                          fullWidth
-                          style={{ color: "white" }}
-                          margin="none"
-                          value={row.category}
-                          onChange={(e) =>
-                            handleRowChange(row._id, "category", e.target.value)
-                          }
-                          className=" text-white"
-                        >
-                          <option value={"Transport"} className=" text-black">
-                            Transport
-                          </option>
-                          <option value={"Food"} className=" text-black">
-                            Food
-                          </option>
-                          <option
-                            value={"Other Expenses"}
-                            className=" text-black"
-                          >
-                            Other Expenses
-                          </option>
-                        </NativeSelect>
-                      ) : (
-                        row.category
-                      )}
-                    </TableCell>
-
-                    <TableCell
-                      width={140}
-                      align="center"
-                      style={{ color: "white" }}
-                    >
-                      {isEditable ? (
-                        <TextField
-                          sx={textFieldStyle}
-                          value={row.desc}
-                          onChange={(e) =>
-                            handleRowChange(row._id, "desc", e.target.value)
-                          }
-                          focused
-                        />
-                      ) : (
-                        row.desc
-                      )}
-                    </TableCell>
-
-                    <TableCell
-                      width={110}
-                      align="center"
-                      style={{ color: "white" }}
-                    >
-                      {isEditable ? (
-                        <TextField
-                          type="number"
-                          value={row.price === 0 ? "" : row.price}
-                          sx={textFieldStyle}
-                          onChange={(e) =>
-                            handleRowChange(
-                              row._id,
-                              "price",
-                              Number(e.target.value)
-                            )
-                          }
-                          fullWidth
-                        />
-                      ) : (
-                        row.price
-                      )}
-                    </TableCell>
-
-                    <TableCell width={110} align="center">
-                      <div className="flex gap-4 justify-center w-full">
-                        {isEditable ? (
-                          <FaRegSave
-                            color="white"
+                              {isEditable ? <NativeSelect
+                                name="category"
+                                value={expense.category}
+                                onChange={(e) => handleRowChange(expense._id, "category", e.target.value)}
+                                className="text-sm bg-transparent !text-white border-none outline-none"
+                              >
+                                <option value="Transport" className="text-black">Transport</option>
+                                <option value="Food" className="text-black">Food</option>
+                                <option value="Other Expenses" className="text-black">Other Expenses</option>
+                              </NativeSelect> : <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                {expense.category}
+                              </span>}
+                            </div>
+                          </div>
+                        </div>
+                        {/* Action Buttons */}
+                        <div className="flex justify-center items-center gap-4 h-full">
+                          {isEditable ? (
+                            <FaRegSave
+                              color={darkMode ? "white" : "black"}
+                              size={"1.5em"}
+                              onClick={() => handleUpdateRow(expense._id)}
+                              className="cursor-pointer hover:scale-105 transition"
+                            />
+                          ) : (
+                            <CiEdit
+                              color={darkMode ? "white" : "black"}
+                              size={"1.5em"}
+                              onClick={() => handleEditRow(expense._id)}
+                              className="cursor-pointer hover:scale-105 transition"
+                            />
+                          )}
+                          <MdDelete
+                            color={darkMode ? "white" : "black"}
                             size={"1.5em"}
-                            onClick={() => handleUpdateRow(row._id)}
+                            onClick={() => handleDeleteRow(expense._id)}
+                            className="cursor-pointer hover:scale-105 transition"
                           />
-                        ) : (
-                          <CiEdit
-                            color="white"
-                            size={"1.5em"}
-                            onClick={() => handleEditRow(row._id)}
-                          />
-                        )}
-                        <MdDelete
-                          color="white"
-                          size={"1.5em"}
-                          onClick={() => handleDeleteRow(row._id)}
-                        />
+                        </div>
                       </div>
-                    </TableCell>
-                  </TableRow>
+
+                      <div className="flex justify-between items-end pt-2 border-t border-gray-200 dark:border-gray-700">
+                        {isEditable ? (
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                              sx={textFieldStyle}
+                              format="DD/MM/YYYY"
+                              className="w-36 bg-black text-white"
+                              value={dayjs(new Date(expense.date))}
+                              onChange={(newValue) => handleRowChange(expense._id, "date", newValue)}
+                              slotProps={{ textField: { fullWidth: true } }}
+                            />
+                          </LocalizationProvider>
+                        ) : <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {useFormatDate(new Date(expense.date))}
+                        </p>}
+                        {isEditable ? (<TextField
+                          type="number"
+                          value={expense.price === 0 ? "" : expense.price}
+                          sx={textFieldStyle}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <span style={{ color: "white" }}>₹</span>
+                              </InputAdornment>
+                            ),
+                          }}
+                          onChange={(e) => handleRowChange(expense._id, "price", Number(e.target.value))}
+                          fullWidth
+                        />) : <p className={`text-xl font-bold ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                          ₹{expense?.price?.toFixed(2)}
+                        </p>}
+                      </div>
+                    </div>
+                  </motion.div>
+
                 );
               })}
-              <TableRow>
-                <TableCell />
-                <TableCell
-                  style={{ color: "white", fontSize: "20px" }}
-                  align="center"
-                  rowSpan={4}
-                >
-                  Total
-                </TableCell>
-                <TableCell />
-                <TableCell
-                  style={{ color: "white" }}
-                  align="center"
-                  rowSpan={6}
-                >
-                  {totalAmount}
-                </TableCell>
-                <TableCell />
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+            </div>
+          </div>
 
-      <div className="md:px-12 px-2 w-full flex justify-between items-center bottom-0 relative  gap-3">
-        {fieldBalance && (
-          <h1 className="text-white border border-gray-400 py-2 px-4   rounded-xl relative right-0">
-            Balance : {fieldBalance}
-          </h1>
-        )}
-        <button
-          className=" cursor-pointer outline-none text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0 "
-          onClick={() => {
-            handleDeleteField(field._id);
-            // setActive(false);
-          }}
-        >
-          Delete Field
-        </button>
-        <button
-          className="text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0 "
-          onClick={handleAddExpenseClick}
-        >
-          Add Expense
-        </button>
-      </div>
+          <div className="md:px-12 px-2 w-full flex justify-between items-center bottom-0 relative  gap-3">
+            {fieldBalance && (
+              <h1 className="text-white border border-gray-400 py-2 px-4   rounded-xl relative right-0">
+                Balance : {fieldBalance}
+              </h1>
+            )}
+            <button
+              className=" cursor-pointer outline-none text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0 "
+              onClick={() => {
+                handleDeleteField(field._id);
+                // setActive(false);
+              }}
+            >
+              Delete Field
+            </button>
+            <button
+              className="text-white border border-gray-400 py-2 px-4 hover:bg-gray-300 hover:text-neutral-900 rounded-xl relative right-0 "
+              onClick={handleAddExpenseClick}
+            >
+              Add Expense
+            </button>
+          </div>
+        </>}
     </>
   );
 }

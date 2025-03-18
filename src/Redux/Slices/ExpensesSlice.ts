@@ -4,17 +4,15 @@ import {
 } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
 interface updateExpensePayload {
   data: expenseFormData;
   id: String;
   fieldId?: String;
+  token?:string
 }
 
-let token = null;
-if (typeof window !== "undefined") {
-  token = localStorage.getItem("token");
-}
 
 export const getAllExpenses = createAsyncThunk(
   "expenses/getExpenses",
@@ -34,7 +32,8 @@ export const getAllExpenses = createAsyncThunk(
 
 export const addExpense = createAsyncThunk(
   "expenses/addExpenses",
-  async ({ data, id }: updateExpensePayload) => {
+  async ({ data, id ,token}: updateExpensePayload) => {
+    const { data: session } = useSession();
     try {
       const response = await axios({
         method: "POST",

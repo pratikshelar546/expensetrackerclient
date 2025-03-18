@@ -65,7 +65,7 @@ const authOptions: AuthOptions = {
     },
 
     // Attach the JWT token to the session
-    session: async ({ session, token: token }) => {
+    session: async ({ session, token }) => {
       const newSession: session = session as session;
       if (newSession.user) {
 
