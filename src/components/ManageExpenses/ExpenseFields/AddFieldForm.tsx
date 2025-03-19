@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import { Label } from "../../../CommonComponent/UI/Label";
 import { Input } from "../../../CommonComponent/UI/Input";
 import { cn } from "@/lib/utils";
-import { useDispatch } from "react-redux";
-import { createField, getField } from "@/Redux/Slices/FieldSlice";
+import { createField } from "@/Redux/Slices/FieldSlice";
 import { addField } from "@/assets/commanInterface/ComonInterface";
 import { useAppDispatch } from "../../../../Hooks";
 import { ModalClose, useModal } from "@/CommonComponent/UI/animated-modal";
@@ -34,14 +33,13 @@ export function AddFieldForm({
     setField((prev) => ({ ...prev, [name]: value }));
   };
 
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (field.fieldName === "") {
       setValidate(true);
     } else {
       if (status === "unauthenticated") {
-        const dignin = await signIn("google")
+        const dignin = await signIn("google");
         console.log(dignin);
       }
       if (session?.user?.token === null) return;
@@ -51,7 +49,6 @@ export function AddFieldForm({
       await fetchFieldData();
     }
   };
-
 
   return (
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">
@@ -105,7 +102,7 @@ export function AddFieldForm({
 
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
           <LabelInputContainer>
-            <Label htmlFor="RecivedAmount"> Amount</Label>
+            <Label htmlFor="RecivedAmount"> Budget</Label>
             <Input
               id="RecivedAmount"
               placeholder="9999"
@@ -115,6 +112,9 @@ export function AddFieldForm({
               onChange={(e) => handleOnChange(e)}
             />
           </LabelInputContainer>
+        </div>
+        <div>
+        
         </div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
