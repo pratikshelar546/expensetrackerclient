@@ -1,12 +1,16 @@
 import { expenseFormData } from "@/assets/commanInterface/ComonInterface";
 import {
   FormControl,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import React, { ChangeEvent } from "react";
 
 type Props = {
@@ -32,31 +36,54 @@ function AddNewExpense({ formData, setFormData }: Props) {
 
   return (
     <>
-      <div>
+      <div className="flex flex-col gap-6 p-4">
         <TextField
           autoFocus
           required
-          margin="dense"
           id="desc"
           name="desc"
           label="Description"
           type="text"
           fullWidth
-          variant="standard"
+          variant="outlined"
           onChange={handleTextChange}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              color: "white",
+              "& fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.23)",
+              },
+              "&:hover fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.4)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "rgba(255, 255, 255, 0.7)",
+            },
+          }}
         />
-        <FormControl variant="standard" fullWidth>
-          <InputLabel id="demo-simple-select-standard-label">
+
+        <FormControl fullWidth>
+          <InputLabel sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
             Category
           </InputLabel>
           <Select
             name="category"
-            fullWidth
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
             value={formData?.category}
             onChange={handleItemChange}
             label="Category"
+            sx={{
+              color: "white",
+              ".MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(255, 255, 255, 0.23)",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(255, 255, 255, 0.4)",
+              },
+              ".MuiSvgIcon-root": {
+                color: "white",
+              },
+            }}
           >
             <MenuItem value={"Transport"}>Transport</MenuItem>
             <MenuItem value={"Food"}>Food</MenuItem>
@@ -64,27 +91,63 @@ function AddNewExpense({ formData, setFormData }: Props) {
           </Select>
         </FormControl>
 
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Date"
+            value={formData?.date ? dayjs(formData?.date) : null}
+            onChange={(newValue) =>
+              setFormData({ ...formData, date: newValue ? newValue.toDate() : null })
+            }
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                color: "white",
+                "& fieldset": {
+                  borderColor: "rgba(255, 255, 255, 0.23)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "rgba(255, 255, 255, 0.4)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "rgba(255, 255, 255, 0.7)",
+              },
+              "& .MuiSvgIcon-root": {
+                color: "white",
+              },
+            }}
+          />
+        </LocalizationProvider>
+
         <TextField
           required
-          margin="dense"
-          id="qyt"
-          name="qyt"
-          label="Quantity"
-          type="number"
-          fullWidth
-          onChange={handleTextChange}
-          variant="standard"
-        />
-        <TextField
-          required
-          margin="dense"
           id="price"
           name="price"
-          label="Bill amount"
+          label="Bill Amount"
           type="number"
           fullWidth
+          variant="outlined"
           onChange={handleTextChange}
-          variant="standard"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <span className="text-white">₹</span>
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              color: "white",
+              "& fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.23)",
+              },
+              "&:hover fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.4)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "rgba(255, 255, 255, 0.7)",
+            },
+          }}
         />
       </div>
     </>

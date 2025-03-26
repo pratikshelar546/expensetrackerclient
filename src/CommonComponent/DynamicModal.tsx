@@ -41,6 +41,23 @@ const DynamicModal = ({
         TransitionComponent={Zoom}
         keepMounted
         onClose={handleClose}
+        sx={{
+          "& .MuiDialog-paper": {
+            backgroundColor: "#1a1a1a",
+            color: "#fff",
+            borderRadius: "12px",
+            border: "1px solid rgba(255, 255, 255, 0.1)"
+          },
+          "& .MuiDialogTitle-root": {
+            color: "#fff"
+          },
+          "& .MuiDialogContent-root": {
+            color: "#fff"
+          },
+          "& .MuiButton-root": {
+            color: "#fff"
+          }
+        }}
         aria-describedby="alert-dialog-slide-description"
       >
         <DialogTitle>{title}</DialogTitle>

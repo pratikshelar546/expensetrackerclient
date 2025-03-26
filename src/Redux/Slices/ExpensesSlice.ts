@@ -33,7 +33,7 @@ export const getAllExpenses = createAsyncThunk(
 export const addExpense = createAsyncThunk(
   "expenses/addExpenses",
   async ({ data, id ,token}: updateExpensePayload) => {
-    const { data: session } = useSession();
+    console.log(data,id,token, "from ");  
     try {
       const response = await axios({
         method: "POST",

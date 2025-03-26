@@ -10,6 +10,7 @@ import { ModalClose, useModal } from "@/CommonComponent/UI/animated-modal";
 import { Dropdown } from "@/CommonComponent/UI/Dropdown";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import ExpensePoolDuration from "@/CommonComponent/ExpensePoolDuration";
 
 const fieldTypeOptions = [{ value: "Personal" }, { value: "Team" }];
 
@@ -25,8 +26,10 @@ export function AddFieldForm({
     fieldName: "",
     RecivedAmount: "",
     fieldType: "Personal",
+    duration: "",
   });
   const [validate, setValidate] = useState(true);
+  const [duration, setDuration] = useState<string | null>(null);
   const { setOpen, open } = useModal();
   const handleOnChange = (e: any) => {
     const { name, value } = e.target;
@@ -40,12 +43,11 @@ export function AddFieldForm({
     } else {
       if (status === "unauthenticated") {
         const dignin = await signIn("google");
-        console.log(dignin);
       }
       if (session?.user?.token === null) return;
       setOpen(false);
       await dispatch(createField({ data: field, token: session?.user?.token }));
-      setField({ fieldName: "", RecivedAmount: "" });
+      setField({ fieldName: "", RecivedAmount: "", duration: "" });
       await fetchFieldData();
     }
   };
@@ -53,26 +55,39 @@ export function AddFieldForm({
   return (
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-        Add New Field
+        Add New Expense Pool
       </h2>
       <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-        Add new field where you can manage your expenses
+        Add new Expense pool where you can manage your expenses
       </p>
 
       <form className="mt-8" onSubmit={handleSubmit}>
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="fieldName">Expense Pool Name</Label>
+            <Input
+              id="fieldName"
+              name="fieldName"
+              placeholder="Field 1"
+              type="text"
+              value={field.fieldName ? field.fieldName : ""}
+              onChange={(e) => handleOnChange(e)}
+            />
+          </LabelInputContainer>
+          <LabelInputContainer>
+            <Label htmlFor="RecivedAmount">Budget Limit</Label>
+            <Input
+              id="RecivedAmount"
+              placeholder="9999"
+              name="RecivedAmount"
+              value={field.RecivedAmount ? field.RecivedAmount : ""}
+              type="number"
+              onChange={(e) => handleOnChange(e)}
+            />
+          </LabelInputContainer>
+        </div>
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="fieldName">Field Name</Label>
-          <Input
-            id="fieldName"
-            name="fieldName"
-            placeholder="Field 1"
-            type="text"
-            value={field.fieldName ? field.fieldName : ""}
-            onChange={(e) => handleOnChange(e)}
-          />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="fieldName">Field Type</Label>
+          <Label htmlFor="fieldName">Expense Pool Type</Label>
           <Dropdown
             id="fieldType"
             setField={setField}
@@ -100,22 +115,17 @@ export function AddFieldForm({
           </div>
         )} */}
 
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-          <LabelInputContainer>
-            <Label htmlFor="RecivedAmount"> Budget</Label>
-            <Input
-              id="RecivedAmount"
-              placeholder="9999"
-              name="RecivedAmount"
-              value={field.RecivedAmount ? field.RecivedAmount : ""}
-              type="number"
-              onChange={(e) => handleOnChange(e)}
-            />
-          </LabelInputContainer>
-        </div>
-        <div>
-        
-        </div>
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="duration">Expense Pool Duration</Label>
+          <ExpensePoolDuration
+            onChange={(value) => setField({ ...field, duration: value || "" })}
+          />
+          <p className="text-white">
+            Selected Expiry Date: {field.duration || "Not selected"}
+          </p>
+        </LabelInputContainer>
+
+        <div></div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
         <ModalClose

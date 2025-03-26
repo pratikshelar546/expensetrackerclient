@@ -1,11 +1,10 @@
-import { User } from "next-auth";
+
 
 export interface expenseFormData {
   desc: string;
-  qyt?: number;
   price?: number;
   category: string;
-  date: Date;
+  date: Date | null;
 }
 
 export interface tableRow {
@@ -33,4 +32,5 @@ export interface addField {
   fieldName?: string;
   RecivedAmount?: string;
   fieldType?: string;
+  duration?: string;
 }
