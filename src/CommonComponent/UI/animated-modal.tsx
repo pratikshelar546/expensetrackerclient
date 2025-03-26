@@ -250,11 +250,11 @@ const CloseIcon = () => {
 export const useOutsideClick = (
   ref: React.RefObject<HTMLDivElement>,
   callback: Function
-) => {
+) => {  
   useEffect(() => {
-    const listener = (event: any) => {
+    const listener = (event: any) => {      
       // DO NOTHING if the element being clicked is the target element or their children
-      if (!ref.current || ref.current.contains(event.target)) {
+      if (!ref.current || ref.current.contains(event.target) || event.target.closest('.MuiPickersPopper-root')) {
         return;
       }
       callback(event);
