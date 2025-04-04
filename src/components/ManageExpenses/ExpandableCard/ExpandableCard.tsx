@@ -40,9 +40,6 @@ export function ExpandableCardDemo({
 
   useOutsideClick(ref, () => setActive(null));
 
-  //   TODO update balance in field section one it updated in expenses section
-  //  TODO Make table responsive
-
   const addNewMember = (id: string) => {
     console.log(id);
   };
@@ -145,6 +142,13 @@ export function ExpandableCardDemo({
                     >
                       balance :{" "}
                       {card?.balance === 0 ? card.RecivedAmount : card.balance}
+                    </motion.p>
+                    <motion.p
+                      layoutId={`description-${card.balance}-${card._id}`}
+                      className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
+                    >
+                      Expiry Date :
+                      {card?.expiry}
                     </motion.p>
                   </div>
                 </div>

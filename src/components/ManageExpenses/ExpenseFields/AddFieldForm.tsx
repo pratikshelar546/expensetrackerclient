@@ -26,10 +26,9 @@ export function AddFieldForm({
     fieldName: "",
     RecivedAmount: "",
     fieldType: "Personal",
-    duration: "",
+    expiry: "",
   });
   const [validate, setValidate] = useState(true);
-  const [duration, setDuration] = useState<string | null>(null);
   const { setOpen, open } = useModal();
   const handleOnChange = (e: any) => {
     const { name, value } = e.target;
@@ -47,7 +46,7 @@ export function AddFieldForm({
       if (session?.user?.token === null) return;
       setOpen(false);
       await dispatch(createField({ data: field, token: session?.user?.token }));
-      setField({ fieldName: "", RecivedAmount: "", duration: "" });
+      setField({ fieldName: "", RecivedAmount: "", expiry: "" });
       await fetchFieldData();
     }
   };
@@ -118,10 +117,10 @@ export function AddFieldForm({
         <LabelInputContainer className="mb-4">
           <Label htmlFor="duration">Expense Pool Duration</Label>
           <ExpensePoolDuration
-            onChange={(value) => setField({ ...field, duration: value || "" })}
+            onChange={(value) => setField({ ...field, expiry: value || "" })}
           />
           <p className="text-white">
-            Selected Expiry Date: {field.duration || "Not selected"}
+            Selected Expiry Date: {field.expiry || "Not selected"}
           </p>
         </LabelInputContainer>
 
