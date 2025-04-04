@@ -26,11 +26,12 @@ export interface expenseField {
   fieldName?: string;
   RecivedAmount: number;
   balance?: number | null;
+  expiry?: String
 }
 
 export interface addField {
   fieldName?: string;
   RecivedAmount?: string;
   fieldType?: string;
-  duration?: string;
+  expiry?: string;
 }

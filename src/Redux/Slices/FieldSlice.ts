@@ -17,7 +17,6 @@ interface updateField {
 export const createField = createAsyncThunk(
   "field/createField",
   async ({ data, token }: { data: addField, token?: string }) => {
-    console.log(data);
 
     try {
       const response = await axios({

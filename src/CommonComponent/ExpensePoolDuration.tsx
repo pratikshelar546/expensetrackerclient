@@ -42,6 +42,7 @@ const ExpensePoolDuration: React.FC<ExpensePoolDurationProps> = ({
 
   const handleCustomDateChange = (date: Dayjs | null) => {
     setCustomDate(date);
+    
     onChange(date ? date.format("DD-MMM-YYYY") : null);
   };
 
@@ -68,6 +69,7 @@ const ExpensePoolDuration: React.FC<ExpensePoolDurationProps> = ({
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             label="Select Custom Date"
+            format="DD-MMM-YYYY"
             value={customDate}
             onChange={handleCustomDateChange}
             disablePast

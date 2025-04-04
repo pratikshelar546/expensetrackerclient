@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { createTheme, Theme as MuiTheme } from "@mui/material/styles";
 import { CssBaseline, ThemeProvider } from "@mui/material";
