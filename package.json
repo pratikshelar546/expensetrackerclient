@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.13.0",
     "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.6",
-    "@mui/x-data-grid": "^7.11.1",
+    "@mui/x-data-grid": "^7.28.3",
     "@mui/x-date-pickers": "^7.11.1",
     "@radix-ui/react-label": "^2.1.0",
     "@reduxjs/toolkit": "^2.2.6",

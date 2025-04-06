@@ -8,10 +8,10 @@ import { useRouter } from "next/navigation";
 
 export function ExpandableCardDemo({
   field,
-  handleDeleteField,
+  // handleDeleteField,
 }: {
   field: expenseField[];
-  handleDeleteField: (id: string) => Promise<void>;
+  // handleDeleteField: (id: string) => Promise<void>;
 }) {
   const [active, setActive] = useState<expenseField | number | boolean | null>(
     null
@@ -110,7 +110,7 @@ export function ExpandableCardDemo({
           </div>
         ) : null}
       </AnimatePresence>
-      <ul className=" dark max-w-3xl mx-auto w-full gap-4 grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2  py-10">
+      <ul className={`dark max-w-3xl mx-auto w-full gap-4 grid grid-cols-1   py-10 ${field.length > 1 && 'md:grid-cols-2 lg:grid-cols-2'}`}>
         {field?.map((card, idx) => (
           <div key={idx}>
             <motion.div

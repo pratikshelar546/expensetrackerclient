@@ -58,7 +58,7 @@ const ExpenseField = () => {
   return (
     <>
       <AddFieldModal fetchFieldData={fetchFieldData} />
-      <ExpandableCardDemo field={fieldId} handleDeleteField={handleDelete} />
+      <ExpandableCardDemo field={fieldId} />
     </>
   );
 };

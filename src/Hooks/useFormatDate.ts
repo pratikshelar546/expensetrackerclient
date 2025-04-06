@@ -1,4 +1,4 @@
-const useFormatDate = (date: Date) => {
+const formatDate = (date: Date) => {
   const departureDate = date;
   const dateObject = new Date(departureDate);
   const day = dateObject.getDate();
@@ -26,4 +26,4 @@ const useFormatDate = (date: Date) => {
   return formattedDate;
 };
 
-export default useFormatDate;
+export default formatDate;

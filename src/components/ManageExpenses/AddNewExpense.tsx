@@ -15,7 +15,7 @@ import React, { ChangeEvent } from "react";
 
 type Props = {
   formData: expenseFormData;
-  setFormData: (formData: expenseFormData) => void;
+  setFormData: React.Dispatch<React.SetStateAction<expenseFormData>>;
 };
 
 function AddNewExpense({ formData, setFormData }: Props) {
@@ -87,6 +87,7 @@ function AddNewExpense({ formData, setFormData }: Props) {
           >
             <MenuItem value={"Transport"}>Transport</MenuItem>
             <MenuItem value={"Food"}>Food</MenuItem>
+            <MenuItem value={"FixedExpense"}>Fixed Expense</MenuItem>
             <MenuItem value={"Other Expenses"}>Other Expenses</MenuItem>
           </Select>
         </FormControl>
