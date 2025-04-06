@@ -22,11 +22,12 @@ export interface userData {
 
 export interface expenseField {
   _id: string;
-  fieldId: string;
+  // fieldId: string;
   fieldName?: string;
   RecivedAmount: number;
   balance?: number | null;
-  expiry?: String
+  expiry?: String,
+  fieldType?: String
 }
 
 export interface addField {

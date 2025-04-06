@@ -2,7 +2,7 @@ import {
   expenseField,
   tableRow,
 } from "@/assets/commanInterface/ComonInterface";
-import useFormatDate from "@/Hooks/useFormatDate";
+import formatDate from "@/Hooks/useFormatDate";
 import { NativeSelect, TextField } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -135,7 +135,7 @@ const MobileExpenseSection = ({
                 </LocalizationProvider>
               ) : (
                 // eslint-disable-next-line react-hooks/rules-of-hooks
-                <p>{useFormatDate(expense?.date)}</p>
+                <p>{formatDate(expense?.date)}</p>
               )}
             </div>
             <div className="flex justify-center items-center gap-14 pt-4 ">

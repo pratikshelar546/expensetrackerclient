@@ -1,27 +1,32 @@
 "use client"
+import { expenseField } from '@/assets/commanInterface/ComonInterface';
+import MergeExpenseModal from '@/components/ManageExpenses/MergeExpense/MergeExpenseModal';
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { IoGitMergeOutline } from 'react-icons/io5';
 import { MdAdd, MdDelete } from 'react-icons/md';
 
-const FLoatingButton = () => {
+const FLoatingButton = ({ field }: { field: expenseField }) => {
     const router = useRouter();
+    const [open, setOpen] = useState(false);
     // const data
     const actions = [
-        { icon: <MdDelete />, name: 'Delete Expense pool' },
-        { icon: <MdAdd />, name: 'Add expense' },
-        { icon: <IoGitMergeOutline />, name: 'Merge Fixed expenses', onclick: () => router.push("/fixedexpense") },
-        { icon: <MdAdd />, name: 'Add Fixed expenses', onclick: () => router.push("/fixedexpense") },
+        { icon: <MdDelete />, name: 'Delete Expense pool', visibility: field.fieldType === "Primary" ? true : true },
+        { icon: <MdAdd />, name: 'Add expense', visibility: field.fieldType === "Primary" ? true : true },
+        { icon: <IoGitMergeOutline />, name: 'Merge Fixed expenses', onclick: () => setOpen(open => !open), visibility: field.fieldType === "Primary" ? false : true },
+        { icon: <MdAdd />, name: 'Add Fixed expenses', onclick: () => router.push("/fixedexpense"), visibility: field.fieldType === "Primary" ? false : true },
 
     ];
     return (
         <>
+            {open && <MergeExpenseModal open={open} setOpen={setOpen} />}
             <SpeedDial ariaLabel="SpeedDial basic example"
                 sx={{ position: 'absolute', bottom: 70, right: 30 }}
                 icon={<SpeedDialIcon />}
             >
                 {actions.map((action) => (
-                    <SpeedDialAction
+                    action.visibility && <SpeedDialAction
                         key={action.name}
                         icon={action.icon}
                         tooltipTitle={action.name}

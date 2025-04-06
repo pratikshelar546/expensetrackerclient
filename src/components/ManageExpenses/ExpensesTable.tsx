@@ -1,8 +1,7 @@
 "use client";
-import DynamicModal from "@/CommonComponent/DynamicModal";
-import SignInBtn from "@/CommonComponent/SignInBtn";
+import CommanExpensesTable from "@/CommonComponent/ExpenseTable/ExpenseTable";
+import FLoatingButton from "@/CommonComponent/FLoatingButton";
 import useCheckDeviceView from "@/Hooks/useDeviceCheck";
-import useFormatDate from "@/Hooks/useFormatDate";
 import {
   addExpense,
   deleteExpenses,
@@ -19,24 +18,11 @@ import {
   expenseFormData,
   tableRow,
 } from "@/assets/commanInterface/ComonInterface";
-import { InputAdornment, NativeSelect, TextField } from "@mui/material";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import dayjs from "dayjs";
-import { motion } from "framer-motion";
 import { useSession } from 'next-auth/react';
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { CiEdit, CiReceipt } from "react-icons/ci";
-import { FaRegSave, FaTag } from "react-icons/fa";
-import { IoIosArrowDown } from "react-icons/io";
-import { IoFastFoodOutline } from "react-icons/io5";
-import { MdDelete, MdEmojiTransportation } from "react-icons/md";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "../../../Hooks";
-import AddNewExpense from "./AddNewExpense";
-import CommanExpensesTable from "@/CommonComponent/ExpenseTable/ExpenseTable";
 
 export default function ExpensesTable({ id }: { id: string }) {
   const darkMode = true;
@@ -49,7 +35,6 @@ export default function ExpensesTable({ id }: { id: string }) {
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
   const [field, setField] = useState<expenseField>({
     _id: "",
-    fieldId: "",
     fieldName: "",
     RecivedAmount: 0,
     balance: null,
@@ -78,7 +63,6 @@ export default function ExpensesTable({ id }: { id: string }) {
     if (getAllExpenses.fulfilled.match(response)) {
       setRow(response.payload.expensesList as tableRow[]);
     }
-    console.log(response);
 
   };
 
@@ -212,6 +196,7 @@ export default function ExpensesTable({ id }: { id: string }) {
   return (
     <>
       <CommanExpensesTable id={id} fetchAllExpenses={fetchAllExpenses} row={row} setRow={setRow} field={field} setField={setField} formData={formData} setFormData={setFormData} handleAddExpense={handleAddExpense} handleDeleteField={handleDeleteField} handleDeleteRow={handleDeleteRow} handleUpdateRow={handleUpdateRow} />
+      <FLoatingButton field={field} />
     </>
   );
 }
