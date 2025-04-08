@@ -11,7 +11,7 @@ type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   title: string;
-  btnTitle: string;
+  btnTitle?: string;
   component: React.ReactNode;
   btnAction: () => void;
 };
@@ -62,9 +62,9 @@ const DynamicModal = ({
       >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>{component}</DialogContent>
-        <DialogActions>
+        {btnTitle && <DialogActions>
           <Button onClick={btnAction}>{btnTitle}</Button>
-        </DialogActions>
+        </DialogActions>}
       </Dialog>
     </>
   );

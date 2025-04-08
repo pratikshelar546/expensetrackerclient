@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { IoGitMergeOutline } from 'react-icons/io5';
 import { MdAdd, MdDelete } from 'react-icons/md';
 
-const FLoatingButton = ({ field }: { field: expenseField }) => {
+const FLoatingButton = ({ field, fetchAllExpenses }: { field: expenseField, fetchAllExpenses: (fieldId: string) => Promise<void>; }) => {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     // const data
@@ -20,9 +20,9 @@ const FLoatingButton = ({ field }: { field: expenseField }) => {
     ];
     return (
         <>
-            {open && <MergeExpenseModal open={open} setOpen={setOpen} />}
+            {open && <MergeExpenseModal open={open} setOpen={setOpen} fieldId={field._id} fetchAllExpenses={fetchAllExpenses} />}
             <SpeedDial ariaLabel="SpeedDial basic example"
-                sx={{ position: 'absolute', bottom: 70, right: 30 }}
+                sx={{ position: 'fixed', bottom: 70, right: 30 }}
                 icon={<SpeedDialIcon />}
             >
                 {actions.map((action) => (
