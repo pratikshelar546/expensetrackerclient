@@ -27,7 +27,8 @@ export interface expenseField {
   RecivedAmount: number;
   balance?: number | null;
   expiry?: String,
-  fieldType?: String
+  fieldType?: String,
+  fieldId?: string
 }
 
 export interface addField {
