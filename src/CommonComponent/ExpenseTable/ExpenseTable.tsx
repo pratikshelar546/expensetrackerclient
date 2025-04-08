@@ -369,7 +369,7 @@ export default function CommanExpensesTable({
                         </div>
                     </div>
 
-                    <div className="absolute z-50 w-full bottom-10 backdrop-blur-xl bg-black/30 border-t border-white/10 p-6">
+                    <div className="sticky z-50 w-full bottom-0 pb-8 backdrop-blur-xl bg-black/30 border-t border-white/10 p-6">
                         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
                             {fieldBalance && (
                                 <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl">

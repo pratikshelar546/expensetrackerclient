@@ -196,7 +196,7 @@ export default function ExpensesTable({ id }: { id: string }) {
   return (
     <>
       <CommanExpensesTable id={id} fetchAllExpenses={fetchAllExpenses} row={row} setRow={setRow} field={field} setField={setField} formData={formData} setFormData={setFormData} handleAddExpense={handleAddExpense} handleDeleteField={handleDeleteField} handleDeleteRow={handleDeleteRow} handleUpdateRow={handleUpdateRow} />
-      <FLoatingButton field={field} />
+      <FLoatingButton field={field} fetchAllExpenses={fetchAllExpenses}/>
     </>
   );
 }

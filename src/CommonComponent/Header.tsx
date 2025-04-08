@@ -17,7 +17,7 @@ export function Header() {
 
       <AnimatePresence mode={'wait'}>
 
-        <header className="flex justify-center items-center top-0 z-[1] sticky w-full">
+        <header className="flex justify-center items-center top-0 z-[1] sticky w-full bg-black">
           <motion.div
             initial={{ y: -70, opacity: 0 }}
             animate={{ y: 1, opacity: 1 }}
