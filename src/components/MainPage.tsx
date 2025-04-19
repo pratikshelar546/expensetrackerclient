@@ -32,7 +32,7 @@ const MainPage = () => {
           </motion.div>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black h-full w-full"></div>
         </motion.div> */}
-      <section className="relative w-full h-full min-h-[calc(100vh-3.6rem)] flex flex-col items-center justify-start border-b border-blue-500/50 mt-14 max-w-6xl">
+      <section className="relative w-full h-full min-h-[calc(100vh-5rem)] flex flex-col items-center justify-start border-b border-blue-500/50 mt-4 max-w-6xl">
         <div className="text-white max-h-full items-center relative w-full grow px-4 mx-4 flex flex-col justify-center gap-8">
           <div className="w-full justify-center items-center gap-6 flex flex-col">
             <motion.h1
@@ -73,9 +73,9 @@ const MainPage = () => {
             >
               <Button 
                 borderRadius="1.75rem"
-                className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white text-lg font-semibold px-14 py-3 shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+                className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white text-lg font-semibold px-20 py-3 shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
               >
-                Get Started Now
+                Add Expense
               </Button>
             </motion.div>
           </div>

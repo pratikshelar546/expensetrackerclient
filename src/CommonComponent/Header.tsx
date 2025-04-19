@@ -30,9 +30,9 @@ export function Header() {
               </h3>
             </div>
             <div className="flex md:gap-10 gap-5">
-              <h3 onClick={() => router.push("/profile")}>Profile</h3>
-              <h3 onClick={() => router.push("/demo")} className=" cursor-pointer">
-                Demo
+              {/* <h3 onClick={() => router.push("/profile")}>Profile</h3> */}
+              <h3 onClick={() => router.push("/expensepool")} className=" cursor-pointer">
+                Expense Pool
               </h3>
               <SignInBtn />
             </div>
