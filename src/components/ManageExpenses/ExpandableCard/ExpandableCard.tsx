@@ -185,7 +185,7 @@ export function ExpandableCardDemo({
       </ul>
         :
         <>
-          <EmptyState onAddExpensePool={() => { }} />
+          <EmptyState />
         </>}
     </>
   );
