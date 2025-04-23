@@ -46,7 +46,7 @@ export function AddFieldModal({
             {session ? <div className="py-3 flex flex-col gap-x-4 gap-y-2 items-start justify-start max-w-lg mx-auto">
               <AddFieldForm fetchFieldData={fetchFieldData} />
             </div> : <div className="w-full h-full items-center justify-center flex flex-col">
-              <h4 className=" font-text-neutral-400 mt-4 text-base font-normal text-center mb-4">You're not logged in yet. Please sign in to continue.</h4>
+              <h4 className=" font-text-neutral-400 mt-4 text-base font-normal text-center mb-4">You&apos;re not logged in yet. Please sign in to continue.</h4>
               <button
                 onClick={() => signIn("google")}
                 className="bg-white text-black py-3 px-4 rounded-md w-[60%] font-semibold flex gap-2 items-center justify-between"
