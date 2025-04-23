@@ -21,7 +21,12 @@ export function Header() {
           <motion.div
             initial={{ y: -70, opacity: 0 }}
             animate={{ y: 1, opacity: 1 }}
-            transition={{ ease: "easeInOut", duration: 0.7, delay: 1.4 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 140,
+              damping: 30,
+              delay: 0.7
+            }}
             className="flex w-full max-w-6xl text-white justify-between md:gap-5 gap-2 items-center py-4 px-8 md:flex-row flex-col text-lg"
           >
             <div>
