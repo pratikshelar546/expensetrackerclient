@@ -37,20 +37,26 @@ const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_SECRET!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
+      console.log(account, "google login try");
+
       if (account?.provider === "google") {
         try {
-          return await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
+          console.log("sucesss", user);
+
+          const checkuser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
+          console.log(checkuser);
+
+          return true;
         } catch (error: any) {
-          console.log(error.message);
+          console.log("SignIn Error:", error.message);
           return false;
         }
       }
-
       return true;
     },
     async jwt({ token, user, account }) {
