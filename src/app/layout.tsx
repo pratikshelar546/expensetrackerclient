@@ -25,12 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-mono bg-black`}>
+      <body className={`${inter.variable} font-mono bg-black min-h-screen flex flex-col`}>
         <DynamicThemeProvider>
 
           <NextAuthProvider>
             <Header />
-            {children}
+              {children}
             <ToastContainer
               position="top-right"
               autoClose={2000}

@@ -16,19 +16,19 @@ export function Header() {
     <SessionProvider>
 
       <AnimatePresence mode={'wait'}>
+        <motion.div
+          initial={{ y: -70, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 140,
+            damping: 30,
+            delay: 0.7
+          }}
+          className="fixed top-0 z-[999] w-full text-white text-lg flex border-b py-2 border-blue-950 border-opacity-70 bg-black"
+        >
+          <div className="wrapper flex w-full items-center justify-between p-3 flex-row gap-5">
 
-        <header className="flex justify-center items-center top-0 z-[1] sticky w-full bg-black">
-          <motion.div
-            initial={{ y: -70, opacity: 0 }}
-            animate={{ y: 1, opacity: 1 }}
-            transition={{ 
-              type: "spring",
-              stiffness: 140,
-              damping: 30,
-              delay: 0.7
-            }}
-            className="flex w-full max-w-6xl text-white justify-between md:gap-5 gap-2 items-center py-4 px-8 md:flex-row flex-col text-lg"
-          >
             <div>
               <h3 onClick={() => router.push("/")} className=" cursor-pointer">
                 ExpenseWise
@@ -39,10 +39,11 @@ export function Header() {
               <h3 onClick={() => router.push("/expensepool")} className=" cursor-pointer">
                 Expense Pool
               </h3>
-              <SignInBtn />
+              <button className="outline-none border-none" onClick={() => router.push("/login")}>Login</button>
             </div>
-          </motion.div>
-        </header>
+          </div>
+
+        </motion.div>
       </AnimatePresence>
     </SessionProvider>
 
