@@ -17,7 +17,7 @@ export function AddFieldModal({
 }) {
   const { data: session } = useSession();
   return (
-    <motion.div className="dark flex items-center justify-between mt-5"
+    <motion.div className="dark flex items-center justify-between w-full max-w-5xl mt-5 sm:flex-row flex-col gap-4"
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       whileTap={{ scale: 0.97 }}
@@ -29,8 +29,8 @@ export function AddFieldModal({
       }}
     >
       <div>
-        <h2 className="text-2xl md:text-4xl font-bold text-white mb-2">Expense Pools</h2>
-        <p className="text-gray-400 etxt-xl">Manage and organize your expense categories</p>
+        <h2 className="text-xl md:text-4xl font-bold text-white mb-2 text-center sm:text-start">Expense Pools</h2>
+        <p className="text-gray-400 text-sm md:text-2xl text-center sm:text-start">Manage and organize your expense categories</p>
       </div>
       <Modal>
         <ModalTrigger className="dark bg-black justify-center group/modal-btn inline-flex h-12 animate-shimmer items-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,rgba(2,6,23,var(--tw-bg-opacity)),45%,#1e2631,55%,rgba(2,6,23,var(--tw-bg-opacity)))] bg-[length:200%_100%] bg-opacity-100 px-6 font-medium text-white transition-colors focus:outline-none mb-5">

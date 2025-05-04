@@ -1,9 +1,8 @@
 import axios from "axios";
-import NextAuth, { Account, AuthOptions, Session, User } from "next-auth";
-import { AdapterUser } from "next-auth/adapters";
+import NextAuth, { AuthOptions, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-
 
 export interface session extends Session {
   user: {
@@ -36,21 +35,38 @@ const authOptions: AuthOptions = {
   },
   providers: [
     GoogleProvider({
+      name: 'google',
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        username: { label: 'email', type: 'text', placeholder: '' },
+        password: { label: 'password', type: 'password', placeholder: '' },
+      },
+      async authorize(credentials: any) {
+        try {
+          if (!credentials.username || !credentials.password) return;
+          const data = {
+            email: credentials.username,
+            password: credentials.password
+          }
+
+          const loginuser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/signin`, data)
+          return loginuser.data.user
+        } catch (error: any) {
+          return error?.data
+        }
+      }
+
+    })
   ],
   callbacks: {
     async signIn({ user, account }) {
-      console.log(account, "google login try");
-
       if (account?.provider === "google") {
         try {
-          console.log("sucesss", user);
-
-          const checkuser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
-          console.log(checkuser);
-
+          await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
           return true;
         } catch (error: any) {
           console.log("SignIn Error:", error.message);
@@ -85,3 +101,4 @@ const authOptions: AuthOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
+

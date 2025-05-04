@@ -6,7 +6,7 @@ const DemoPage = () => {
   return (
     <>
       {/* <DynamicThemeProvider> */}
-      <Suspense fallback={<div className="w-full h-full text-3xl text-white absolute top-0 left-0 flex items-center justify-center">Loading all expenses...</div>}>
+      <Suspense fallback={<div className="w-full h-full min-h-screen text-3xl text-white flex items-center justify-center">Loading all expenses...</div>}>
         <CustomProvider>
           <MainDemoPage />
         </CustomProvider>
