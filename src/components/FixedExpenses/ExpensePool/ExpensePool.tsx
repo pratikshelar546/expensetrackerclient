@@ -46,13 +46,7 @@ const ExpensePool = ({ fieldId }: { fieldId: string }) => {
     }, [status, fieldId])
 
     // const handleAddExpense = 
-    return (
-        <>
-            <div>ExpensePool :{fieldId}</div>
-            <ExpensesTable id={fieldId} />
-
-        </>
-    )
+    return <ExpensesTable id={fieldId} />
 }
 
 export default ExpensePool

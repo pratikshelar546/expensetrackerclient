@@ -46,15 +46,15 @@ export function FixedExpense() {
             RecivedAmount: "",
             expiry: ""
         }
-        const createdField = await dispatch(createField({ data: feild, token: session?.user?.token ||"" }))
+        const createdField = await dispatch(createField({ data: feild, token: session?.user?.token || "" }))
 
         router.push(`/fixedexpense/${createdField.payload}`)
     }
     return (
         <>
-            <section className="flex w-full items-center justify-center h-[70vh]">
-                <div className="flex w-full max-w-5xl items-center justify-between">
-                    <div className="text-white md:w-2/3">
+            <section className="flex w-full items-center justify-center min-h-screen relative">
+                <div className="flex w-full flex-col max-w-5xl items-center justify-between">
+                    <div className="text-white md:w-2/3 text-center">
                         <p className="uppercase text-sm tracking-wide text-sky-400 mb-2">
                             Smart Budgeting
                         </p>
@@ -73,8 +73,8 @@ export function FixedExpense() {
                             while budgeting.
                         </p>
                     </div>
-                    <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-                        {field ? <ExpandableCardDemo field={field} /> :
+                    <div className="w-full md:w-1/3 flex justify-center md:justify-end h-[12rem]">
+                        {field ? <ExpandableCardDemo field={field} fieldType={"Primary"} /> :
                             <Button containerClassName="w-64" onClick={handleAddFixedExpense}>Add Fixed Expense</Button>
                         }
                     </div>

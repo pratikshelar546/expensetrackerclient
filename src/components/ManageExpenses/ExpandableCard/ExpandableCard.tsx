@@ -9,10 +9,10 @@ import EmptyState from "@/CommonComponent/UI/EmptyState";
 
 export function ExpandableCardDemo({
   field,
-  // handleDeleteField,
+  fieldType,
 }: {
   field: expenseField[];
-  // handleDeleteField: (id: string) => Promise<void>;
+  fieldType: String;
 }) {
   const [active, setActive] = useState<expenseField | number | boolean | null>(
     null
@@ -113,7 +113,7 @@ export function ExpandableCardDemo({
       </AnimatePresence>
       {field.length > 0 ? <ul className={`dark max-w-3xl mx-auto w-full gap-4 grid grid-cols-1   py-10 ${field.length > 1 && 'md:grid-cols-2 lg:grid-cols-2'}`}>
         {field?.map((card, idx) => (
-          <div key={idx}>
+          <div key={idx} className="w-full h-full">
             <motion.div
               onMouseEnter={() => setHoverIndex(idx)}
               onMouseLeave={() => setHoverIndex(null)}
@@ -123,8 +123,8 @@ export function ExpandableCardDemo({
               className=" relative group  block p-2 h-full w-full "
             >
               <div className="dark p-4 flex flex-col md:flex-row justify-between items-center rounded-xl cursor-pointer relative bg-slate-950 z-20 border dark:border-white/[0.2] hover:border-slate-800 h-full">
-                <div className="flex gap-4 flex-col md:flex-row">
-                  <div>
+                <div className="flex gap-4 flex-col md:flex-row h-full">
+                  <div className="flex justify-between flex-col h-full">
                     <motion.h3
                       layoutId={`title-${card.fieldName}-${card._id}`}
                       className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
@@ -137,20 +137,22 @@ export function ExpandableCardDemo({
                     >
                       Recived Amount: {card?.RecivedAmount}
                     </motion.p>
-                    <motion.p
+                    {card.fieldType !== "Primary" && <motion.p
                       layoutId={`description-${card.balance}-${card._id}`}
                       className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
                     >
                       balance :{" "}
                       {card?.balance === 0 ? card.RecivedAmount : card.balance}
-                    </motion.p>
-                    <motion.p
-                      layoutId={`description-${card.balance}-${card._id}`}
-                      className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
-                    >
-                      Expiry Date :
-                      {card?.expiry}
-                    </motion.p>
+                    </motion.p>}
+                    {card.fieldType !== "Primary" &&
+                      <motion.p
+                        layoutId={`description-${card.balance}-${card._id}`}
+                        className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
+                      >
+                        Expiry Date :
+                        {card?.expiry}
+                      </motion.p>
+                    }
                   </div>
                 </div>
                 <motion.button

@@ -124,13 +124,13 @@ export default function CommanExpensesTable({
             )}
             {status !== "authenticated" ? (
                 <>
-                    <h1 className="font-bold text-2xl text-black w-full text-center ">
+                    <h1 className="font-bold text-2xl text-white w-full text-center ">
                         Sign in first to add expense
                     </h1>
                     <SignInBtn />
                 </>
             ) : (
-                <div className="h-full  flex flex-col bg-gradient-to-b from-neutral-900 to-neutral-950">
+                <div className="h-full relative top-24  flex flex-col bg-gradient-to-b from-neutral-900 to-neutral-950">
                     <div className="w-full flex justify-center items-start py-8">
                         <div className="flex flex-col gap-8 w-full max-w-7xl px-4">
                             {categories.map((category, index) => (

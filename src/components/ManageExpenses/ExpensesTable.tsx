@@ -77,7 +77,7 @@ export default function ExpensesTable({ id }: { id: string }) {
 
   const handleDeleteField = async (id: string) => {
     await dispatch(deleteField({ id, token }));
-    router.push("/demo");
+    router.push("/fixedexpense");
   };
 
   const handleAddExpense = async () => {
