@@ -28,7 +28,7 @@
     "framer-motion": "^11.16.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.402.0",
-    "motion": "^12.4.7",
+    "motion": "^12.10.0",
     "next": "14.2.4",
     "next-auth": "^4.24.8",
     "react": "^18",

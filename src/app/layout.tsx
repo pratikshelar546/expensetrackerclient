@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { NextAuthProvider } from "../CustomProvider/Provider";
 import DynamicThemeProvider from "@/themeprovider/DynamicThemeProvider";
+import Footer from "@/CommonComponent/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,7 +31,8 @@ export default function RootLayout({
 
           <NextAuthProvider>
             <Header />
-              {children}
+            {children}
+            <Footer />
             <ToastContainer
               position="top-right"
               autoClose={2000}
