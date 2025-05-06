@@ -9,10 +9,8 @@ import EmptyState from "@/CommonComponent/UI/EmptyState";
 
 export function ExpandableCardDemo({
   field,
-  fieldType,
 }: {
-  field: expenseField[];
-  fieldType: String;
+  field: expenseField[]
 }) {
   const [active, setActive] = useState<expenseField | number | boolean | null>(
     null

@@ -74,7 +74,7 @@ export function FixedExpense() {
                         </p>
                     </div>
                     <div className="w-full md:w-1/3 flex justify-center md:justify-end h-[12rem]">
-                        {field ? <ExpandableCardDemo field={field} fieldType={"Primary"} /> :
+                        {field ? <ExpandableCardDemo field={field} /> :
                             <Button containerClassName="w-64" onClick={handleAddFixedExpense}>Add Fixed Expense</Button>
                         }
                     </div>
