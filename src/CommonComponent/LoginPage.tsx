@@ -95,6 +95,7 @@ const LoginPage = () => {
         }
         try {
             const adduser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/signup`, data);
+            console.log(adduser);
 
             if (adduser && adduser.data.success) {
                 toast.dismiss(loading);
@@ -104,11 +105,13 @@ const LoginPage = () => {
                 setSignUp(false)
             }
         } catch (error: any) {
+            console.log(error);
+
             toast.dismiss(loading);
             if (error?.response?.status === 401) return toast.error("USer already exist", {
                 autoClose: 2000
             });
-            toast.error("Somthing went wrong!", {
+            toast.error(error.response.data.error || "Somthing went wrong!", {
                 autoClose: 2000
             })
         }
@@ -116,7 +119,7 @@ const LoginPage = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center px-4">
-            <div className={`w-full max-w-lg bg-neutral-900  rounded-2xl shadow-2xl p-8 md:p-10 text-white ${signup && "relative top-24"}`}>
+            <div className={`w-full max-w-lg bg-neutral-900  rounded-2xl shadow-2xl p-8 md:p-10 text-white ${signup && "relative pt-24"}`}>
                 <h2 className="text-2xl font-semibold text-center mb-2">
                     {signup ? "Join now to track your expenses" : "Log in to manage expenses"}
                 </h2>
@@ -193,7 +196,7 @@ const LoginPage = () => {
                 </div>
 
                 <button
-                    onClick={() => { signIn('google',{ callbackUrl: '/' }) }}
+                    onClick={() => { signIn('google', { callbackUrl: '/' }) }}
                     className="w-full flex items-center justify-center gap-3 bg-white text-black py-3 rounded-xl hover:bg-gray-200 transition"
                 >
                     <FcGoogle size={22} />
