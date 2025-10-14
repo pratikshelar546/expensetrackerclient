@@ -1,0 +1,16 @@
+{
+    "name": "ExpenseWise",
+    "short_name": "expensewise",
+    "description": "ExpenseWise is a tool for managing and tracking expenses",
+    "icons": [
+        {
+            "src": "/test.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "/",
+    "display": "standalone",
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff"
+}

@@ -7,7 +7,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { NextAuthProvider } from "../CustomProvider/Provider";
 import DynamicThemeProvider from "@/themeprovider/DynamicThemeProvider";
 import Footer from "@/CommonComponent/Footer";
-
+import { useEffect } from "react";
+import Head from "next/head";
+import SWRegister from "./SWRegister";
+// import "../../public/manifest.json"
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -26,7 +29,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0a74da" />
+</head>
       <body className={`${inter.variable} font-mono bg-black min-h-screen flex flex-col`}>
+        <SWRegister/>
         <DynamicThemeProvider>
 
           <NextAuthProvider>

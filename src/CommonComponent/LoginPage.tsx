@@ -94,6 +94,7 @@ const LoginPage = () => {
             ...(phoneNo.current && { phoneNo: phoneNo.current })
         }
         try {
+            
             const adduser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/signup`, data);
             console.log(adduser);
 
