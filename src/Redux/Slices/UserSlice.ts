@@ -1,7 +1,6 @@
 import { userData } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { error } from "console";
 import { API_URL } from "@/config/api";
 
 export const signup = createAsyncThunk(

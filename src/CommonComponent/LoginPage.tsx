@@ -58,6 +58,14 @@ const LoginPage = () => {
                 email: email.current,
                 password: pass.current,
             });
+            const credentials = {
+                email: email.current,
+                password: pass.current,
+            }
+            const credLogiin =await signIn('credentials', credentials);
+
+            console.log(credLogiin,"credLogiin");
+            
             toast.dismiss(loading);
             toast.success("Sign in successfully", {
                 autoClose: 2000
