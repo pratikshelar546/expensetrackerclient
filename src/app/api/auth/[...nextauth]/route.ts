@@ -3,6 +3,7 @@ import NextAuth, { AuthOptions, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { API_URL } from "@/config/api";
 
 export interface session extends Session {
   user: {
@@ -19,7 +20,7 @@ interface token extends JWT {
 const createToken = async (user: User) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}user/auth`,
+      `${API_URL}user/auth`,
       user
     );
 
@@ -55,7 +56,7 @@ const authOptions: AuthOptions = {
             password: credentials.password
           }
 
-          const loginuser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/signin`, data)
+          const loginuser = await axios.post(`${API_URL}user/signin`, data)
           return loginuser.data.user
         } catch (error: any) {
           return error?.data
@@ -68,7 +69,7 @@ const authOptions: AuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/auth`, user);
+          await axios.post(`${API_URL}user/auth`, user);
           return true;
         } catch (error: any) {
           console.log("SignIn Error:", error.message);

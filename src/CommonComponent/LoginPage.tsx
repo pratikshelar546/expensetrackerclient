@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { toast } from 'react-toastify';
+import { API_URL } from '@/config/api';
 
 const LoginPage = () => {
     const [errorField, setErrorField] = useState({
@@ -53,7 +54,7 @@ const LoginPage = () => {
         }
         try {
             
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/signin`, {
+            const res = await axios.post(`${API_URL}user/signin`, {
                 email: email.current,
                 password: pass.current,
             });
@@ -109,7 +110,7 @@ const LoginPage = () => {
         }
         try {
             
-            const adduser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/signup`, data);
+            const adduser = await axios.post(`${API_URL}user/signup`, data);
             console.log(adduser);
 
             if (adduser && adduser.data.success) {

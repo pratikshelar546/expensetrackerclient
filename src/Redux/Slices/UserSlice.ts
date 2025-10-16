@@ -2,13 +2,14 @@ import { userData } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { error } from "console";
+import { API_URL } from "@/config/api";
 
 export const signup = createAsyncThunk(
   "user/signup",
   async (data: userData) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}user/auth`,
+        `${API_URL}user/auth`,
         data
       );
 
