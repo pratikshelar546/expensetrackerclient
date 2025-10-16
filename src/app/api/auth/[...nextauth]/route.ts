@@ -46,6 +46,8 @@ const authOptions: AuthOptions = {
         password: { label: 'password', type: 'password', placeholder: '' },
       },
       async authorize(credentials: any) {
+        console.log(process.env.NEXT_PUBLIC_API_URL,"backend url");
+        
         try {
           if (!credentials.username || !credentials.password) return;
           const data = {

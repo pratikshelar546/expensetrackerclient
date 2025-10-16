@@ -51,28 +51,42 @@ const LoginPage = () => {
             toast.dismiss(loading);
             return;
         }
-        const res = await signIn('credentials', {
-            username: email.current,
-            password: pass.current,
-            redirect: false,
-        })
-        toast.dismiss(loading);
-        if (!res?.error) {
+        try {
+            
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/signin`, {
+                email: email.current,
+                password: pass.current,
+            });
+            toast.dismiss(loading);
             toast.success("Sign in successfully", {
                 autoClose: 2000
             });
             router.push("/");
-        } else {
-            if (res.status === 401) {
-                toast.error("Invalid credentials, try again!");
-            } else if (res.status === 404) {
-                toast.error("User not found");
-            } else if (res.status === 500) {
-                toast.error("'Missing Credentials!");
-            } else {
-                toast.error("something went wrong!")
-            }
+        } catch (error:any) {
+            console.log(error);
+            toast.dismiss(loading);
+            toast.error(error.response.data.error || "Somthing went wrong!", {
+                autoClose: 2000
+            })
+            
         }
+            
+        //     if (!res?.error) {
+        //         toast.success("Sign in successfully", {
+        //             autoClose: 2000
+        //         });
+        //         router.push("/");
+        //     } else {
+        //         if (res.status === 401) {
+        //             toast.error("Invalid credentials, try again!");
+        //         } else if (res.status === 404) {
+        //             toast.error("User not found");
+        //         } else if (res.status === 500) {
+        //             toast.error("'Missing Credentials!");
+        //         } else {
+        //             toast.error("something went wrong!")
+        //         }
+        // }
     }
 
     const handleSignUp = async () => {
