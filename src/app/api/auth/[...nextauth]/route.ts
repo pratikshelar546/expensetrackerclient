@@ -47,23 +47,19 @@ const authOptions: AuthOptions = {
         password: { label: 'password', type: 'password', placeholder: '' },
       },
       async authorize(credentials: any) {
-        console.log("=== NEXTAUTH DEBUG START ===");
-        console.log(process.env.NEXT_PUBLIC_API_URL,"backend url");
         
         try {
-          console.log(credentials,"credentials");
           if (!credentials.username || !credentials.password) return;
           const data = {
             email: credentials.username,
             password: credentials.password
           }
-console.log(data,"data");
 
-          const loginuser = await axios.post(`${API_URL}user/signin`, data)
+          const loginuser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || API_URL}user/signin`, data)
           return loginuser.data.user
         } catch (error: any) {
           console.error("Authorize error:", error.response?.data || error.message);
-          return null
+          return error?.data
         }
       }
 
