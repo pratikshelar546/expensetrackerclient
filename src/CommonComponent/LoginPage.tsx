@@ -53,16 +53,17 @@ const LoginPage = () => {
             return;
         }
         try {
-            
+            console.log(API_URL,"API_URL from login page");
             const res = await axios.post(`${API_URL}user/signin`, {
                 email: email.current,
                 password: pass.current,
             });
             const credentials = {
-                email: email.current,
+                username: email.current,
                 password: pass.current,
+                redirect: false
             }
-            const credLogiin =await signIn('credentials', credentials);
+            const credLogiin = await signIn('credentials', credentials);
 
             console.log(credLogiin,"credLogiin");
             
