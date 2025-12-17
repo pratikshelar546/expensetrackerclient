@@ -106,7 +106,6 @@ export default function CommanExpensesTable({
     useEffect(() => {
         setOpenStates(categories[0]);
     }, [categories]);
-    console.log(openStates);
 
     return (
         <>

@@ -1,12 +1,9 @@
-"use client";
+
 import React from "react";
 import * as motion from "framer-motion/client";
-import Image from "next/image";
-import sideImage from "../assets/icons/image.png";
 import { Button } from "@/CommonComponent/UI/moving-border";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 const MainPage = () => {
-  const router = useRouter();
   return (
     <main className="w-full min-h-screen flex flex-col items-center overflow-x-hidden overflow-y-hidden">
       <section className="relative w-full h-full min-h-[calc(100vh-1.5rem)] flex flex-col items-center justify-start border-b border-blue-500/50 mt-4 max-w-6xl">
@@ -48,13 +45,21 @@ const MainPage = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.9 }}
             >
+              <Link href="/expensepool">
               <Button
-                onClick={() => router.push("/expensepool")}
                 borderRadius="1.75rem"
                 className="bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-600 hover:to-blue-800 text-white text-lg font-semibold px-20 py-3 shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
               >
                 Add Expense
               </Button>
+              </Link>
+              {/* <Button
+                onClick={() => router.push("/expensepool")}
+                borderRadius="1.75rem"
+                className="bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-600 hover:to-blue-800 text-white text-lg font-semibold px-20 py-3 shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+              >
+                Add Expense
+              </Button> */}
             </motion.div>
           </div>
         </div>

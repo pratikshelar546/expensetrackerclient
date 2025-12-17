@@ -1,12 +1,10 @@
 import { expenseFormData } from "@/assets/commanInterface/ComonInterface";
+import CategoryDropdown from "@/CommonComponent/UI/CategoryDropdown";
 import {
+  Autocomplete,
   FormControl,
   InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
+  TextField
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -18,21 +16,36 @@ type Props = {
   setFormData: React.Dispatch<React.SetStateAction<expenseFormData>>;
 };
 
-function AddNewExpense({ formData, setFormData }: Props) {
-  const handleItemChange = (event: SelectChangeEvent) => {
-    const { name, value } = event.target;
+const categoryOptions = [
+  "Transport",
+  "Food",
+  "Fixed Expense",
+  "Other Expenses",
+];
 
-    setFormData({ ...formData, [name]: value });
+function AddNewExpense({ formData, setFormData }: Props) {
+  const handleCategoryChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    value: string | null
+  ) => {
+    
+    // When value is not in dropdown, it's "Add New..." or user typed custom; allow anything
+    setFormData({
+      ...formData,
+      category: value || "",
+    });
   };
 
   const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === "qty" || name === "price" ? parseFloat(value) : value,
+      [name]:
+        name === "qty" || name === "price"
+          ? parseFloat(value)
+          : value,
     });
   };
-  // console.log(formData);
 
   return (
     <>
@@ -64,37 +77,15 @@ function AddNewExpense({ formData, setFormData }: Props) {
         />
 
         <FormControl fullWidth>
-          <InputLabel sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
-            Category
-          </InputLabel>
-          <Select
-            name="category"
-            value={formData?.category}
-            onChange={handleItemChange}
-            label="Category"
-            sx={{
-              color: "white",
-              ".MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(255, 255, 255, 0.23)",
-              },
-              "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(255, 255, 255, 0.4)",
-              },
-              ".MuiSvgIcon-root": {
-                color: "white",
-              },
-            }}
-          >
-            <MenuItem value={"Transport"}>Transport</MenuItem>
-            <MenuItem value={"Food"}>Food</MenuItem>
-            <MenuItem value={"FixedExpense"}>Fixed Expense</MenuItem>
-            <MenuItem value={"Other Expenses"}>Other Expenses</MenuItem>
-          </Select>
+         <CategoryDropdown
+         value={formData?.category || ""}
+         onChange={handleCategoryChange}
+         />
         </FormControl>
 
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
-            label="Date"
+            label="Date*"
             value={formData?.date ? dayjs(formData?.date) : null}
             onChange={(newValue) =>
               setFormData({ ...formData, date: newValue ? newValue.toDate() : null })
