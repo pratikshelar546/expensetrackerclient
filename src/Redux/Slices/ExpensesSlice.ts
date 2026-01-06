@@ -56,7 +56,7 @@ export const updateExpense = createAsyncThunk(
     try {
       const response = await axios({
         method: "PUT",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/udpateExpense/${id}`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/updateExpense/${id}`,
         data,
       });
       return response.data;
