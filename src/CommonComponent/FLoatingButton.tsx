@@ -6,21 +6,53 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { IoGitMergeOutline } from 'react-icons/io5';
 import { MdAdd, MdDelete } from 'react-icons/md';
+import { RiUserAddFill } from "react-icons/ri";
+import { useAppDispatch } from '../../Hooks';
+import { useSession } from 'next-auth/react';
+import AddMemberModal from './AddMemberModal';
 
 const FLoatingButton = ({ field, fetchAllExpenses }: { field: expenseField, fetchAllExpenses: (fieldId: string) => Promise<void>; }) => {
     const router = useRouter();
     const [open, setOpen] = useState(false);
+    const dispatch = useAppDispatch();
+    const { data: session } = useSession();
+    const [memberData, setMemberData] = useState<{ email: string }[]>([]);
+    const [openMemberModal, setOpenMemberModal] = useState(false);
     // const data
-    const actions = [
-        { icon: <MdDelete />, name: 'Delete Expense pool', visibility: field.fieldType === "Primary" ? true : true },
-        { icon: <MdAdd />, name: 'Add expense', visibility: field.fieldType === "Primary" ? true : true },
-        { icon: <IoGitMergeOutline />, name: 'Merge Fixed expenses', onclick: () => setOpen(open => !open), visibility: field.fieldType === "Primary" ? false : true },
-        { icon: <MdAdd />, name: 'Add Fixed expenses', onclick: () => router.push("/fixedexpense"), visibility: field.fieldType === "Primary" ? false : true },
 
+
+    const actions = [
+      {
+        icon: <MdDelete />,
+        name: "Delete Expense pool",
+        visibility: field.fieldType === "Primary" ? true : true,
+      },
+      {
+        icon: <RiUserAddFill />,
+        name: "Add member",
+        onclick: () => {
+          setOpenMemberModal((open) => !open);
+        },
+        visibility: field.fieldType === "Primary" ? true : true,
+      },
+      {
+        icon: <IoGitMergeOutline />,
+        name: "Merge Fixed expenses",
+        onclick: () => setOpen((open) => !open),
+        visibility: field.fieldType === "Primary" ? false : true,
+      },
+      {
+        icon: <MdAdd />,
+        name: "Add Fixed expenses",
+        onclick: () => router.push("/fixedexpense"),
+        visibility: field.fieldType === "Primary" ? false : true,
+      },
     ];
+    console.log(openMemberModal,"modal");
     return (
         <>
             {open && <MergeExpenseModal open={open} setOpen={setOpen} fieldId={field._id} fetchAllExpenses={fetchAllExpenses} />}
+            {openMemberModal && <AddMemberModal openModal={openMemberModal} setOpenModal={setOpenMemberModal} fieldId={field._id} />}
             <SpeedDial ariaLabel="SpeedDial basic example"
                 sx={{ position: 'fixed', bottom: 70, right: 30 }}
                 icon={<SpeedDialIcon />}

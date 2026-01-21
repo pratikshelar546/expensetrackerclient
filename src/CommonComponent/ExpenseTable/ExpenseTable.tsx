@@ -15,14 +15,40 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CiEdit, CiReceipt } from "react-icons/ci";
 import { FaRegSave, FaTag } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { MdDelete, MdEmojiTransportation } from "react-icons/md";
-import { useAppDispatch } from "../../../Hooks";
+
+// Constants
+const CATEGORY_OPTIONS = ["Transport", "Food", "Other Expenses"] as const;
+const TEXT_FIELD_STYLE = {
+    "& .MuiInputBase-input": {
+        color: "white",
+        padding: "4px !important",
+        textAlign: "right",
+    },
+    "& .MuiOutlinedInput-root": {
+        "& fieldset": {},
+    },
+    "& .MuiIconButton-root": {
+        color: "white",
+    },
+} as const;
+
+// Helper function to get category icon
+const getCategoryIcon = (category: string) => {
+    switch (category) {
+        case "Food":
+            return <IoFastFoodOutline className="w-5 h-5 text-gray-400" />;
+        case "Transport":
+            return <MdEmojiTransportation className="w-5 h-5 text-gray-400" />;
+        default:
+            return <FaTag className="w-4 h-4 text-gray-400" />;
+    }
+};
 
 export default function CommanExpensesTable({
     id,
@@ -51,61 +77,101 @@ export default function CommanExpensesTable({
     handleUpdateRow: (id: string) => void;
     handleDeleteRow: (id: string) => void
 }) {
-    const dispatch = useAppDispatch();
-    const router = useRouter();
     const [editableRow, setEditableRow] = useState<string>("");
     const [openStates, setOpenStates] = useState<string>("");
     const [open, setOpen] = useState(false);
-    const { data: session, status } = useSession();
-    const token = session?.user?.token || undefined;
+    const { status } = useSession();
 
-
-
+    // Fetch expenses when authenticated and id is available
     useEffect(() => {
         if (status !== "loading" && id) {
             fetchAllExpenses(id);
         }
     }, [status, id]);
 
-    const totalAmount = row?.reduce((sum, { price = 0 }) => sum + price, 0);
-    const fieldBalance = (field.RecivedAmount ?? 0) - totalAmount;
+    // Memoize total amount calculation
+    const totalAmount = useMemo(() => {
+        return row?.reduce((sum, { price = 0 }) => sum + (price || 0), 0) || 0;
+    }, [row]);
 
+    // Memoize field balance calculation
+    const fieldBalance = useMemo(() => {
+        return (field.RecivedAmount ?? 0) - totalAmount;
+    }, [field.RecivedAmount, totalAmount]);
 
-    const handleRowChange = (id: string, field: keyof tableRow, value: any) => {
+    // Memoize categories extraction
+    const categories = useMemo(() => {
+        if (!row || row.length === 0) return [];
+        const uniqueCategories = new Set<string>();
+        row.forEach((item) => {
+            if (item.category) {
+                uniqueCategories.add(item.category);
+            }
+        });
+        return Array.from(uniqueCategories);
+    }, [row]);
+
+    // Initialize openStates with first category when categories change
+    useEffect(() => {
+        if (categories.length > 0 && !openStates) {
+            setOpenStates(categories[0]);
+        }
+    }, [categories, openStates]);
+
+    // Memoize expenses grouped by category for better performance
+    const expensesByCategory = useMemo(() => {
+        const grouped = new Map<string, tableRow[]>();
+        row?.forEach((expense) => {
+            const category = expense.category || "Other Expenses";
+            if (!grouped.has(category)) {
+                grouped.set(category, []);
+            }
+            grouped.get(category)!.push(expense);
+        });
+        return grouped;
+    }, [row]);
+
+    // Memoize category statistics
+    const categoryStats = useMemo(() => {
+        const stats = new Map<string, { count: number; total: number }>();
+        categories.forEach((category) => {
+            const expenses = expensesByCategory.get(category) || [];
+            const count = expenses.length;
+            const total = expenses.reduce((sum, expense) => sum + (expense.price || 0), 0);
+            stats.set(category, { count, total });
+        });
+        return stats;
+    }, [categories, expensesByCategory]);
+
+    // Optimized row change handler with useCallback
+    const handleRowChange = useCallback((id: string, fieldName: keyof tableRow, value: any) => {
         setRow((prevRows: tableRow[]) =>
             prevRows.map((row) =>
-                row._id === id ? { ...row, [field]: value } : row
+                row._id === id ? { ...row, [fieldName]: value } : row
             )
         );
-    };
+    }, [setRow]);
 
-    const handleEditRow = (id: string) => {
-        setEditableRow(id === editableRow ? "" : id);
-    };
+    // Optimized edit row handler
+    const handleEditRow = useCallback((id: string) => {
+        setEditableRow((prev) => prev === id ? "" : id);
+    }, []);
 
+    // Toggle category open state
+    const toggleCategory = useCallback((category: string) => {
+        setOpenStates((prev) => prev === category ? "" : category);
+    }, []);
 
-    const textFieldStyle = {
-        "& .MuiInputBase-input": {
-            color: "white",
-            padding: "4px !important",
-            textAlign: "right",
-        },
-        "& .MuiOutlinedInput-root": {
-            "& fieldset": {},
-        },
-        "& .MuiIconButton-root": {
-            color: "white",
-        },
-    };
+    // Toggle modal
+    const toggleModal = useCallback(() => {
+        setOpen((prev) => !prev);
+    }, []);
 
-    const categories = useMemo(
-        () => [...new Set(row?.map((item) => item.category))],
-        [row]
-    );
-
-    useEffect(() => {
-        setOpenStates(categories[0]);
-    }, [categories]);
+    // Handle modal close after adding expense
+    const handleModalClose = useCallback(async () => {
+        await handleAddExpense();
+        setOpen(false);
+    }, [handleAddExpense]);
 
     return (
         <>
@@ -118,7 +184,7 @@ export default function CommanExpensesTable({
                         <AddNewExpense formData={formData} setFormData={setFormData} />
                     }
                     btnTitle="Add Expense"
-                    btnAction={() => { handleAddExpense(); setOpen(open => !open) }}
+                    btnAction={handleModalClose}
                 />
             )}
             {status !== "authenticated" ? (
@@ -134,53 +200,42 @@ export default function CommanExpensesTable({
 
                         <div className="w-full flex justify-center items-start py-8">
                             <div className="flex flex-col gap-8 w-full max-w-7xl px-4">
-                                {categories.map((category, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        className="flex flex-col w-full gap-4 backdrop-blur-lg bg-white/5 p-6 rounded-2xl"
-                                    >
-                                        <button
-                                            onClick={() => {
-                                                setOpenStates(category);
-                                            }}
-                                            className="flex items-center gap-3 text-gray-300 hover:text-white transition-all group"
-                                        >
-                                            <IoIosArrowDown
-                                                size={"1.5em"}
-                                                className={`transform transition-all duration-300 ${openStates === category ? "rotate-180" : ""
-                                                    } group-hover:scale-110`}
-                                            />
-                                            <h1 className="font-bold text-2xl tracking-tight">
-                                                {category}
-                                            </h1>
-                                            <span className="text-sm bg-white/10 px-3 py-1 rounded-full">
-                                                {
-                                                    row.filter((expense) => expense.category === category)
-                                                        .length
-                                                }{" "}
-                                                items - ₹
-                                                {row
-                                                    .filter((expense) => expense.category === category)
-                                                    .reduce(
-                                                        (total, expense) => total + (expense.price || 0),
-                                                        0
-                                                    )
-                                                    .toLocaleString()}
-                                            </span>
-                                        </button>
+                                {categories.map((category, index) => {
+                                    const stats = categoryStats.get(category);
+                                    const categoryExpenses = expensesByCategory.get(category) || [];
+                                    const isOpen = openStates === category;
 
+                                    return (
                                         <motion.div
-                                            animate={{ height: openStates === category ? "auto" : 0 }}
-
-                                            className="overflow-hidden"
+                                            key={category}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.1 }}
+                                            className="flex flex-col w-full gap-4 backdrop-blur-lg bg-white/5 p-6 rounded-2xl"
                                         >
-                                            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 py-4">
-                                                {row
-                                                    .filter((expense) => expense.category === category)
-                                                    .map((expense) => {
+                                            <button
+                                                onClick={() => toggleCategory(category)}
+                                                className="flex items-center gap-3 text-gray-300 hover:text-white transition-all group"
+                                            >
+                                                <IoIosArrowDown
+                                                    size={"1.5em"}
+                                                    className={`transform transition-all duration-300 ${isOpen ? "rotate-180" : ""
+                                                        } group-hover:scale-110`}
+                                                />
+                                                <h1 className="font-bold text-2xl tracking-tight">
+                                                    {category}
+                                                </h1>
+                                                <span className="text-sm bg-white/10 px-3 py-1 rounded-full">
+                                                    {stats?.count || 0} items - ₹{stats?.total.toLocaleString() || 0}
+                                                </span>
+                                            </button>
+
+                                            <motion.div
+                                                animate={{ height: isOpen ? "auto" : 0 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 py-4">
+                                                    {categoryExpenses.map((expense) => {
                                                         const isEditable = expense._id === editableRow;
                                                         return (
                                                             <motion.div
@@ -217,13 +272,7 @@ export default function CommanExpensesTable({
                                                                                     </h3>
                                                                                 )}
                                                                                 <div className="flex items-center mt-2 space-x-2">
-                                                                                    {expense.category === "Food" ? (
-                                                                                        <IoFastFoodOutline className="w-5 h-5 text-gray-400" />
-                                                                                    ) : expense.category === "Transport" ? (
-                                                                                        <MdEmojiTransportation className="w-5 h-5 text-gray-400" />
-                                                                                    ) : (
-                                                                                        <FaTag className="w-4 h-4 text-gray-400" />
-                                                                                    )}
+                                                                                    {getCategoryIcon(expense.category)}
 
                                                                                     {isEditable ? (
                                                                                         <NativeSelect
@@ -238,30 +287,26 @@ export default function CommanExpensesTable({
                                                                                             }
                                                                                             className="text-sm bg-transparent text-white border-none outline-none"
                                                                                         >
-                                                                                            <option
-                                                                                                value="Transport"
-                                                                                                className="text-black"
-                                                                                            >
-                                                                                                Transport
-                                                                                            </option>
-                                                                                            <option
-                                                                                                value="Food"
-                                                                                                className="text-black"
-                                                                                            >
-                                                                                                Food
-                                                                                            </option>
-                                                                                            <option
-                                                                                                value="Other Expenses"
-                                                                                                className="text-black"
-                                                                                            >
-                                                                                                Other Expenses
-                                                                                            </option>
+                                                                                            {CATEGORY_OPTIONS.map((option) => (
+                                                                                                <option
+                                                                                                    key={option}
+                                                                                                    value={option}
+                                                                                                    className="text-black"
+                                                                                                >
+                                                                                                    {option}
+                                                                                                </option>
+                                                                                            ))}
                                                                                         </NativeSelect>
                                                                                     ) : (
                                                                                         <span className="text-sm text-gray-400">
                                                                                             {expense.category}
                                                                                         </span>
                                                                                     )}
+                                                                                </div>
+                                                                                <div className="mt-2">
+                                                                                    <span className="text-xs text-gray-500">
+                                                                                       By: {expense.userName}
+                                                                                    </span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -303,7 +348,7 @@ export default function CommanExpensesTable({
                                                                                 dateAdapter={AdapterDayjs}
                                                                             >
                                                                                 <DatePicker
-                                                                                    sx={textFieldStyle}
+                                                                                    sx={TEXT_FIELD_STYLE}
                                                                                     format="DD/MM/YYYY"
                                                                                     className="w-36"
                                                                                     value={dayjs(new Date(expense.date))}
@@ -327,7 +372,7 @@ export default function CommanExpensesTable({
                                                                                 value={
                                                                                     expense.price === 0 ? "" : expense.price
                                                                                 }
-                                                                                sx={textFieldStyle}
+                                                                                sx={TEXT_FIELD_STYLE}
                                                                                 InputProps={{
                                                                                     startAdornment: (
                                                                                         <InputAdornment position="start">
@@ -356,10 +401,11 @@ export default function CommanExpensesTable({
                                                             </motion.div>
                                                         );
                                                     })}
-                                            </div>
+                                                </div>
+                                            </motion.div>
                                         </motion.div>
-                                    </motion.div>
-                                ))}
+                                    );
+                                })}
                                 {categories?.length <= 0 && (
                                     <>
                                         <h1 className="text-white text-3xl text-center">
@@ -388,7 +434,7 @@ export default function CommanExpensesTable({
                                         Delete Field
                                     </button>
                                     <button
-                                        onClick={() => setOpen((value) => !value)}
+                                        onClick={toggleModal}
                                         className="px-6 py-2 rounded-xl bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-300"
                                     >
                                         Add Expense

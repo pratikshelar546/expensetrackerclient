@@ -34,7 +34,7 @@ export default function RootLayout({
   <meta name="theme-color" content="#0a74da" />
 </head>
       <body className={`${inter.variable} font-mono bg-black min-h-screen flex flex-col`}>
-        <SWRegister/>
+        {/* <SWRegister/> */}
         <DynamicThemeProvider>
 
           <NextAuthProvider>

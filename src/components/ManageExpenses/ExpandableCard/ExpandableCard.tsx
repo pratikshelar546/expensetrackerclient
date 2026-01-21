@@ -2,7 +2,7 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "@/Hooks/use-outside-click";
-import { expenseField } from "@/assets/commanInterface/ComonInterface";
+import { expenseField, expenseFieldData } from "@/assets/commanInterface/ComonInterface";
 import ExpensesTable from "../ExpensesTable";
 import { useRouter } from "next/navigation";
 import EmptyState from "@/CommonComponent/UI/EmptyState";
@@ -10,14 +10,13 @@ import EmptyState from "@/CommonComponent/UI/EmptyState";
 export function ExpandableCardDemo({
   field,
 }: {
-  field: expenseField[]
+  field: expenseFieldData[]
 }) {
   const [active, setActive] = useState<expenseField | number | boolean | null>(
     null
   );
   const [hoveredIndex, setHoverIndex] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-  const id = useId();
   const router = useRouter();
 
   useEffect(() => {
@@ -109,8 +108,10 @@ export function ExpandableCardDemo({
           </div>
         ) : null}
       </AnimatePresence>
-      {field.length > 0 ? <ul className={`dark max-w-3xl mx-auto w-full gap-4 grid grid-cols-1   py-10 ${field.length > 1 && 'md:grid-cols-2 lg:grid-cols-2'}`}>
-        {field?.map((card, idx) => (
+      {field?.length > 0 ? <ul className={`dark max-w-3xl mx-auto w-full gap-4 grid grid-cols-1   py-10 ${field?.length > 1 && 'md:grid-cols-2 lg:grid-cols-2'}`}>
+        {field?.map((data, idx) => {
+          const card = data.expensefields;
+          return(
           <div key={idx} className="w-full h-full">
             <motion.div
               onMouseEnter={() => setHoverIndex(idx)}
@@ -139,8 +140,8 @@ export function ExpandableCardDemo({
                       layoutId={`description-${card.balance}-${card._id}`}
                       className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
                     >
-                      balance :{" "}
-                      {card?.balance === 0 ? card.RecivedAmount : card.balance}
+                      Total spent :{" "}
+                      {card?.balance === 0 ? 0:card.RecivedAmount- (card.balance ?? 0)}
                     </motion.p>}
                     {card.fieldType !== "Primary" &&
                       <motion.p
@@ -181,7 +182,7 @@ export function ExpandableCardDemo({
             </motion.div>
             <div className="dark bg-gradient-to-r from-transparent block sm:hidden via-neutral-300 dark:via-neutral-700 to-transparent my-2 h-[1px] w-full" />
           </div>
-        ))}
+        )})}
       </ul>
         :
         <>

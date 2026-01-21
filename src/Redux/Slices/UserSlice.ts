@@ -38,14 +38,15 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(signup.pending, (state) => {
-        state.status = "Loding";
+        state.status = "loading";
       })
       .addCase(signup.fulfilled, (state, action: PayloadAction<userData>) => {
-        (state.status = "succeeded"), (state.user = action.payload);
+        state.status = "succeeded";
+        state.user = action.payload;
       })
       .addCase(signup.rejected, (state, action) => {
-        (state.status = "Rejected"),
-          (state.error = action.error.message || "Falid to add user Try again");
+        state.status = "failed";
+        state.error = action.error.message || "Failed to add user Try again";
       });
   },
 });

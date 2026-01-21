@@ -11,6 +11,7 @@ import { Dropdown } from "@/CommonComponent/UI/Dropdown";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ExpensePoolDuration from "@/CommonComponent/ExpensePoolDuration";
+import { toast } from "react-toastify";
 
 const fieldTypeOptions = [{ value: "Personal" }, { value: "Team" }];
 
@@ -27,6 +28,7 @@ export function AddFieldForm({
     RecivedAmount: "",
     fieldType: "Personal",
     expiry: "",
+    email: "",
   });
   const [validate, setValidate] = useState(true);
   const { setOpen, open } = useModal();
@@ -39,15 +41,38 @@ export function AddFieldForm({
     e.preventDefault();
     if (field.fieldName === "") {
       setValidate(true);
-    } else {
+      return;
+    }
+    try {
       if (status === "unauthenticated") {
-        const dignin = await signIn("google");
+        await signIn("google");
+        return;
       }
-      if (session?.user?.token === null) return;
+      if (!session?.user?.token) return;
       setOpen(false);
-      await dispatch(createField({ data: field, token: session?.user?.token }));
-      setField({ fieldName: "", RecivedAmount: "", expiry: "" });
-      await fetchFieldData();
+
+      const response = await dispatch(createField({ data: field, token: session?.user?.token }));
+      if (createField.fulfilled.match(response)) {
+        toast.success("Field created successfully");
+        setField({ fieldName: "", RecivedAmount: "", expiry: "", email: "" });
+        await fetchFieldData();
+      } else if (createField.rejected.match(response)) {
+        const errorMsg =
+          typeof response.payload === "string"
+            ? response.payload
+            : (response.error && response.error.message)
+              ? response.error.message
+              : "Failed to create Field";
+        toast.error(errorMsg);
+      } else {
+        toast.error("An unexpected error occurred while creating field.");
+      }
+    } catch (error: any) {
+      const msg =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Something went wrong!";
+      toast.error(msg);
     }
   };
 
@@ -95,7 +120,7 @@ export function AddFieldForm({
           />
         </LabelInputContainer>
 
-        {/* {field.fieldType === "Team" && (
+        {field.fieldType === "Team" && (
           <div>
             <LabelInputContainer className="mb-4">
               <Label htmlFor="addmember">Add Team Member</Label>
@@ -107,12 +132,12 @@ export function AddFieldForm({
                 name="addmember"
                 placeholder="member@xyz.com"
                 type="email"
-                value={field.fieldName ? field.fieldName : ""}
+                value={field.email ? field.email : ""}
                 onChange={(e) => handleOnChange(e)}
               />
             </LabelInputContainer>
           </div>
-        )} */}
+        )}
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="duration">Expense Pool Duration</Label>
@@ -148,7 +173,7 @@ const BottomGradient = () => {
   );
 };
 
-const LabelInputContainer = ({
+export const LabelInputContainer = ({
   children,
   className,
 }: {

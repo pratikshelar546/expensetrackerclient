@@ -22,7 +22,7 @@ const DynamicModal = ({
   title,
   btnTitle,
   component,
-  btnAction,
+  btnAction
 }: Props) => {
   const handleClickOpen = () => {
     setOpen(true);
@@ -35,7 +35,7 @@ const DynamicModal = ({
   return (
     <>
       <Dialog
-        className="bg-transparent"
+        className={`bg-transparent`}
         fullWidth
         open={open}
         TransitionComponent={Zoom}
@@ -43,8 +43,8 @@ const DynamicModal = ({
         onClose={handleClose}
         sx={{
           "& .MuiDialog-paper": {
-            backgroundColor: "#1a1a1a",
-            color: "#fff",
+            backgroundColor: "black",
+            color: "black",
             borderRadius: "12px",
             border: "1px solid rgba(255, 255, 255, 0.1)"
           },
@@ -62,9 +62,12 @@ const DynamicModal = ({
       >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>{component}</DialogContent>
-        {btnTitle && <DialogActions>
-          <Button onClick={btnAction}>{btnTitle}</Button>
-        </DialogActions>}
+        {(btnTitle || true) && (
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            {btnTitle && <Button onClick={btnAction}>{btnTitle}</Button>}
+          </DialogActions>
+        )}
       </Dialog>
     </>
   );

@@ -4,7 +4,6 @@ import {
 } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { useSession } from "next-auth/react";
 
 interface updateExpensePayload {
   data: expenseFormData;
@@ -33,7 +32,6 @@ export const getAllExpenses = createAsyncThunk(
 export const addExpense = createAsyncThunk(
   "expenses/addExpenses",
   async ({ data, id ,token}: updateExpensePayload) => {
-    console.log(data,id,token, "from ");  
     try {
       const response = await axios({
         method: "POST",
@@ -116,7 +114,7 @@ const expenseSlice = createSlice({
         state.error = action.error.message || "Failed to add expense";
       })
       .addCase(getAllExpenses.pending, (state) => {
-        state.status = "Loading";
+        state.status = "loading";
       })
       .addCase(
         getAllExpenses.fulfilled,
@@ -126,8 +124,8 @@ const expenseSlice = createSlice({
         }
       )
       .addCase(getAllExpenses.rejected, (state, action) => {
-        (state.status = "Failed"),
-          (state.error = action.error.message || "Failed to get expense");
+        state.status = "failed";
+        state.error = action.error.message || "Failed to get expense";
       })
       .addCase(updateExpense.pending, (state) => {
         state.status = "loading";

@@ -1,4 +1,3 @@
-"use client";
 import {
   addField,
   expenseField,
@@ -30,7 +29,7 @@ export const createField = createAsyncThunk(
 
       return response.data.response._id;
     } catch (error: any) {
-      throw error.message;
+      throw error.response.data.message || error.message;
     }
   }
 );
@@ -131,7 +130,7 @@ const fieldSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createField.pending, (state) => {
-        state.status = "pending";
+        state.status = "loading";
       })
       .addCase(
         createField.fulfilled,
@@ -145,7 +144,7 @@ const fieldSlice = createSlice({
         state.error = action.error.message || "Failed to add expense";
       })
       .addCase(getField.pending, (state) => {
-        state.status = "pending";
+        state.status = "loading";
       })
       .addCase(
         getField.fulfilled,
@@ -187,7 +186,7 @@ const fieldSlice = createSlice({
         state.error = action.error.message || "Failed to add expense";
       })
       .addCase(getFieldById.pending, (state) => {
-        state.status = "pending";
+        state.status = "loading";
       })
       .addCase(
         getFieldById.fulfilled,

@@ -13,6 +13,7 @@ export interface tableRow {
   price?: number;
   category: string;
   date: Date;
+  userName: string;
 }
 
 export interface userData {
@@ -31,9 +32,14 @@ export interface expenseField {
   fieldId?: string,
 }
 
+export interface expenseFieldData {
+  expensefields: expenseField;
+}
+
 export interface addField {
   fieldName?: string;
   RecivedAmount?: string;
   fieldType?: string;
   expiry?: string;
+  email?: string;
 }
