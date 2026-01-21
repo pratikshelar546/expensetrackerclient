@@ -60,6 +60,7 @@ function AddNewExpense({ formData, setFormData }: Props) {
           fullWidth
           variant="outlined"
           onChange={handleTextChange}
+          value={formData?.desc || ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               color: "white",
@@ -119,6 +120,7 @@ function AddNewExpense({ formData, setFormData }: Props) {
           fullWidth
           variant="outlined"
           onChange={handleTextChange}
+          value={formData?.price || ""}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

@@ -20,7 +20,7 @@ export function Header() {
             type: "spring",
             stiffness: 140,
             damping: 30,
-            delay: 0.7
+            delay: 0.2
           }}
           className="fixed top-0 z-[999] w-full text-white sm:text-lg text-sm text-wrap flex border-b py-2 border-blue-950 border-opacity-70 bg-black"
         >

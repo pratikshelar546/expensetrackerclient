@@ -15,6 +15,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CiEdit, CiReceipt } from "react-icons/ci";
 import { FaRegSave, FaTag } from "react-icons/fa";
@@ -81,6 +82,7 @@ export default function CommanExpensesTable({
     const [openStates, setOpenStates] = useState<string>("");
     const [open, setOpen] = useState(false);
     const { status } = useSession();
+    const router = useRouter();
 
     // Fetch expenses when authenticated and id is available
     useEffect(() => {
@@ -173,6 +175,9 @@ export default function CommanExpensesTable({
         setOpen(false);
     }, [handleAddExpense]);
 
+    const switchToChatMode = () => {
+        router.push(`/chat/${id}`);
+    }
     return (
         <>
             {open && (
@@ -195,11 +200,19 @@ export default function CommanExpensesTable({
                     <SignInBtn />
                 </>
             ) : (
-                <div className="h-full min-h-screen pt-24 flex flex-col">
-                    <div className=" flex-1 ">
-
-                        <div className="w-full flex justify-center items-start py-8">
-                            <div className="flex flex-col gap-8 w-full max-w-7xl px-4">
+                <div className="h-full min-h-screen pt-24 flex flex-col items-center justify-center">
+                    <div className="flex-1 w-full flex flex-col items-center justify-center">
+                        <div className="w-full flex justify-center items-center py-8 flex-col gap-3">
+                            <div className="w-full max-w-7xl px-4 flex justify-between items-center gap-4 mb-4">
+                                <h3 className="text-2xl font-bold text-white text-center">All Expenses</h3>
+                                <button
+                                    onClick={switchToChatMode}
+                                    className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 hover:text-purple-300 rounded-xl transition-all duration-300 border border-purple-500/30"
+                                >
+                                    <span className="text-sm font-medium">💬 Chat Mode</span>
+                                </button>
+                            </div>
+                            <div className="flex flex-col gap-8 items-center justify-center w-full max-w-6xl px-4">
                                 {categories.map((category, index) => {
                                     const stats = categoryStats.get(category);
                                     const categoryExpenses = expensesByCategory.get(category) || [];
@@ -305,7 +318,7 @@ export default function CommanExpensesTable({
                                                                                 </div>
                                                                                 <div className="mt-2">
                                                                                     <span className="text-xs text-gray-500">
-                                                                                       By: {expense.userName}
+                                                                                        By: {expense.userName}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -418,14 +431,17 @@ export default function CommanExpensesTable({
 
                         <div className="w-full pb-8 backdrop-blur-xl bg-black/30 border-t border-white/10 p-6">
                             <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-                                {fieldBalance && (
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl">
-                                        <span className="text-gray-400">Balance:</span>
-                                        <span className="text-xl font-bold text-white">
-                                            ₹{fieldBalance}
-                                        </span>
-                                    </div>
-                                )}
+                                <div className="flex items-center gap-4">
+                                    {fieldBalance && (
+                                        <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl">
+                                            <span className="text-gray-400">Balance:</span>
+                                            <span className="text-xl font-bold text-white">
+                                                ₹{fieldBalance}
+                                            </span>
+                                        </div>
+                                    )}
+                                
+                                </div>
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => handleDeleteField(field._id)}

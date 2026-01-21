@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Header } from "@/CommonComponent/Header";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { NextAuthProvider } from "../CustomProvider/Provider";
+import { NextAuthProvider } from "../../CustomProvider/Provider";
 import DynamicThemeProvider from "@/themeprovider/DynamicThemeProvider";
 import Footer from "@/CommonComponent/Footer";
 import { useEffect } from "react";
 import Head from "next/head";
-import SWRegister from "./SWRegister";
+import SWRegister from "../SWRegister";
 // import "../../public/manifest.json"
 const inter = Inter({
   subsets: ["latin"],
@@ -40,7 +40,7 @@ export default function RootLayout({
           <NextAuthProvider>
             <Header />
             {children}
-            <Footer />
+            {/* <Footer /> */}
             <ToastContainer
               position="top-right"
               autoClose={2000}

@@ -9,12 +9,13 @@ export interface session extends Session {
   user: {
     name: string,
     email: string,
-    userId: string,
+    id: string,
     token: string
   }
 }
 interface token extends JWT {
   jwtToken: string
+  id: string
 }
 
 const createToken = async (user: User) => {
@@ -47,7 +48,6 @@ const authOptions: AuthOptions = {
         password: { label: 'password', type: 'password', placeholder: '' },
       },
       async authorize(credentials: any) {
-        
         try {
           if (!credentials.username || !credentials.password) return;
           const data = {
@@ -79,9 +79,15 @@ const authOptions: AuthOptions = {
       return true;
     },
     async jwt({ token, user, account }) {
+      // Persist userId from the user object into the JWT, so we can attach it to session.user below.
       if (user && account) {
         try {
           token.jwtToken = await createToken(user);
+          // Attach userId if exists (for both Google and Credentials sign-in)
+          if (user) {
+            // @ts-ignore
+            token.id= user?.userId as string;
+          }
         } catch (error: any) {
           console.error("JWT Error:", error.message);
         }
@@ -89,12 +95,12 @@ const authOptions: AuthOptions = {
       return token;
     },
 
-    // Attach the JWT token to the session
+    // Attach the JWT token and userId to the session
     session: async ({ session, token }) => {
       const newSession: session = session as session;
-      if (newSession.user) {
-
+      if (newSession.user) {        
         newSession.user.token = token.jwtToken as string;
+        newSession.user.id = token.id as string;
       }
       return newSession!;
     },
