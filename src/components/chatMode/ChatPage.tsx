@@ -10,6 +10,7 @@ import { RxDotsVertical } from "react-icons/rx";
 import DynamicModal from '@/CommonComponent/DynamicModal'
 import AddNewExpense from '@/components/ManageExpenses/AddNewExpense'
 import { useRouter } from 'next/navigation'
+import { calculateSettlements, SettlementResult } from '@/utils/expenseSettlement'
 
 const MessageOptions = ({
   onDelete,
@@ -68,12 +69,16 @@ const ChatPage = ({ id }: { id: string }) => {
     category: "",
     price: NaN,
   })
+  const [showSplitView, setShowSplitView] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)
 
   const switchToTableView = () => {
     router.push(`/expofield/${id}`)
   }
+
+  // Calculate settlements using the utility function
+  const settlementData: SettlementResult = calculateSettlements(expenses)
 
   // Scroll to bottom when expenses change
   useEffect(() => {
@@ -247,7 +252,13 @@ const ChatPage = ({ id }: { id: string }) => {
       <section className="w-full min-h-screen flex flex-col px-2 md:px-4 items-center justify-between bg-[#18181b] pt-20">
         <div className="w-full max-w-3xl flex-1 flex flex-col p-2 md:p-4 overflow-y-auto">
           <div className="flex flex-col items-center justify-center py-6">
-            <div className="w-full flex justify-end mb-4">
+            <div className="w-full flex justify-between items-center mb-4 gap-2">
+              <button
+                onClick={() => setShowSplitView(!showSplitView)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 hover:bg-green-500/30 hover:text-green-300 rounded-xl transition-all duration-300 border border-green-500/30"
+              >
+                <span className="text-sm font-medium">💰 Split Expenses</span>
+              </button>
               <button
                 onClick={switchToTableView}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 hover:text-blue-300 rounded-xl transition-all duration-300 border border-blue-500/30"
@@ -255,6 +266,86 @@ const ChatPage = ({ id }: { id: string }) => {
                 <span className="text-sm font-medium">📊 Table View</span>
               </button>
             </div>
+
+            {/* Settlement View */}
+            {showSplitView && (
+              <div className="w-full mb-4 p-4 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm">
+                {expenses.length === 0 ? (
+                  <p className="text-gray-400 text-center">No expenses to split yet.</p>
+                ) : Object.keys(settlementData.userBalances).length < 2 ? (
+                  <p className="text-gray-400 text-center">Need at least 2 people to split expenses.</p>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-bold text-white mb-4">Expense Split Summary</h3>
+                    
+                    {/* Individual Spending */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-300 mb-2">Individual Spending:</h4>
+                      <div className="space-y-2">
+                        {Object.entries(settlementData.userBalances).map(([userId, user]) => (
+                          <div key={userId} className="flex justify-between items-center text-sm p-2 bg-white/5 rounded-lg">
+                            <div className="flex flex-col">
+                              <span className="text-white font-medium">{user.name}</span>
+                              <span className="text-xs text-gray-400">
+                                Spent: ₹{user.spent.toFixed(2)} | Share: ₹{user.share.toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              {user.balance > 0 ? (
+                                <span className="text-green-400 font-bold">+₹{user.balance.toFixed(2)}</span>
+                              ) : user.balance < 0 ? (
+                                <span className="text-red-400 font-bold">₹{user.balance.toFixed(2)}</span>
+                              ) : (
+                                <span className="text-gray-400 font-medium">₹0.00</span>
+                              )}
+                              <span className="text-xs text-gray-500">
+                                {user.balance > 0 ? 'Should receive' : user.balance < 0 ? 'Should pay' : 'Balanced'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Total and Average */}
+                    <div className="mb-4 p-3 bg-white/5 rounded-lg border border-white/10">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-300">Total Amount:</span>
+                        <span className="text-white font-bold">₹{settlementData.totalAmount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-300">Average per person:</span>
+                        <span className="text-green-400 font-bold">₹{settlementData.averageShare.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* Settlements */}
+                    {settlementData.settlements.length > 0 ? (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-300 mb-2">Settlement Transactions:</h4>
+                        <div className="space-y-2">
+                          {settlementData.settlements.map((settlement, index) => (
+                            <div key={index} className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg hover:bg-red-500/15 transition-colors">
+                              <p className="text-sm text-white">
+                                <span className="font-semibold text-red-400">{settlement.from}</span>
+                                {" should pay "}
+                                <span className="font-bold text-white text-base">₹{settlement.amount.toFixed(2)}</span>
+                                {" to "}
+                                <span className="font-semibold text-green-400">{settlement.to}</span>
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                        <p className="text-sm text-green-400 text-center font-medium">All expenses are balanced! 🎉</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
             <p className="text-gray-400 mb-4 text-sm md:text-base">This is your Expense Tracker. Add your expense below in the format: <span className="font-semibold text-white">category description amount</span>
               <br /> Example: <span className="text-green-400">Food pizza 200</span>
             </p>
