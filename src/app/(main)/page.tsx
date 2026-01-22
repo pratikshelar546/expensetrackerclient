@@ -5,6 +5,7 @@ import MainPage from "@/components/LandingPage/MainPage";
 import CustomProvider from "@/CustomProvider/CustomProvider";
 import Head from "next/head";
 import { Suspense } from "react";
+
 export default function Home() {
 
   return (
