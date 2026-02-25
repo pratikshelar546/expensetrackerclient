@@ -60,6 +60,7 @@ const ChatPage = ({ id }: { id: string }) => {
   const token = session?.user?.token || undefined;
   const myId = session?.user?.id;
   const [expenses, setExpenses] = useState<tableRow[]>([])
+  const [participants, setParticipants] = useState<string[]>([])
   const [input, setInput] = useState('')
   const [updateModalOpen, setUpdateModalOpen] = useState(false)
   const [expenseToUpdate, setExpenseToUpdate] = useState<tableRow | null>(null)
@@ -78,7 +79,7 @@ const ChatPage = ({ id }: { id: string }) => {
   }
 
   // Calculate settlements using the utility function
-  const settlementData: SettlementResult = calculateSettlements(expenses)
+  const settlementData: SettlementResult = calculateSettlements(expenses, participants)
 
   // Scroll to bottom when expenses change
   useEffect(() => {
@@ -93,6 +94,7 @@ const ChatPage = ({ id }: { id: string }) => {
       const expense = await dispatch(getFieldById({ id: id, token: token }));
       if (getFieldById.fulfilled.match(expense)) {
         setExpenses(expense.payload.field.expenses);
+        setParticipants(expense.payload.field.participants);
       }
     } catch (error) {
       toast.error("Failed to fetch expenses", {
@@ -422,7 +424,10 @@ const ChatPage = ({ id }: { id: string }) => {
                         </div>
                       </div>
                       <span className={`text-[10px] text-gray-400 px-2`}>
-                        {(exp.date ? new Date(exp.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "")}
+                        {(exp.date
+                          ? `${new Date(exp.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' })} ${new Date(exp.date).toLocaleTimeString('en-IN', { hour: "2-digit", minute: "2-digit" })}`
+                          : "")
+                        }
                       </span>
                     </div>
                   </div>
