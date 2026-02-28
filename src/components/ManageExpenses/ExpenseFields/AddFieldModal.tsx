@@ -10,12 +10,15 @@ import { AddFieldForm } from "./AddFieldForm";
 import { signIn, useSession } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import * as motion from "framer-motion/client";
+import { FaPlus } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 export function AddFieldModal({
   fetchFieldData,
 }: {
   fetchFieldData: () => Promise<void>;
 }) {
   const { data: session } = useSession();
+  const router = useRouter();
   return (
     <motion.div className="dark flex items-center justify-between w-full max-w-5xl mt-5 sm:flex-row flex-col gap-4"
       initial={{ scale: 0.8, opacity: 0 }}
@@ -33,7 +36,7 @@ export function AddFieldModal({
         <p className="text-gray-400 text-sm md:text-2xl text-center sm:text-start">Manage and organize your expense categories</p>
       </div>
       <Modal>
-        <ModalTrigger className="dark bg-black justify-center group/modal-btn inline-flex h-12 animate-shimmer items-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,rgba(2,6,23,var(--tw-bg-opacity)),45%,#1e2631,55%,rgba(2,6,23,var(--tw-bg-opacity)))] bg-[length:200%_100%] bg-opacity-100 px-6 font-medium text-white transition-colors focus:outline-none mb-5">
+        <ModalTrigger className=" dark bg-black justify-center group/modal-btn inline-flex h-12 animate-shimmer items-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,rgba(2,6,23,var(--tw-bg-opacity)),45%,#1e2631,55%,rgba(2,6,23,var(--tw-bg-opacity)))] bg-[length:200%_100%] bg-opacity-100 px-6 font-medium text-white transition-colors focus:outline-none mb-5">
           <span className="group-hover/modal-btn:translate-y-44 text-center transition duration-500">
             Add Expense Pool
           </span>
@@ -41,6 +44,22 @@ export function AddFieldModal({
             🚀
           </div>
         </ModalTrigger>
+        <div className="overflow-hidden relative dark bg-black justify-center group/modal-btn inline-flex h-12 animate-shimmer items-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,rgba(2,6,23,var(--tw-bg-opacity)),45%,#1e2631,55%,rgba(2,6,23,var(--tw-bg-opacity)))] bg-[length:200%_100%] bg-opacity-100 px-6 font-medium text-white transition-colors focus:outline-none mb-5 cursor-pointer" onClick={() => router.push("/fixedexpense")}>
+          <span className="group-hover/modal-btn:translate-y-44 text-center transition duration-500">
+            Add Fixed Expense
+          </span>
+          <div className="-translate-y-10 group-hover/modal-btn:translate-y-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">
+          {/* Icon suitable for Fixed Expense, e.g., a credit card or dollar sign */}
+          <span className="flex items-center justify-center">
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-sky-300" viewBox="0 0 24 24">
+              <rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M3 10h18" stroke="currentColor" strokeWidth="1.5" />
+              <circle cx="8.5" cy="15.5" r="1" fill="currentColor" />
+              <circle cx="12" cy="15.5" r="1" fill="currentColor" />
+            </svg>
+          </span>
+          </div>
+        </div>
         <ModalBody>
           <ModalContent>
             {session ? <div className="py-3 flex flex-col gap-x-4 gap-y-2 items-start justify-start max-w-lg mx-auto">
