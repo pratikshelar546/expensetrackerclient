@@ -48,7 +48,7 @@ const FLoatingButton = ({ field, fetchAllExpenses }: { field: expenseField, fetc
         visibility: field.fieldType === "Primary" ? false : true,
       },
     ];
-    console.log(openMemberModal,"modal");
+
     return (
         <>
             {open && <MergeExpenseModal open={open} setOpen={setOpen} fieldId={field._id} fetchAllExpenses={fetchAllExpenses} />}

@@ -13,11 +13,26 @@ import { IoRemove } from 'react-icons/io5'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 const MergeExpenseModal = ({ open, setOpen, fieldId, fetchAllExpenses }: { open: boolean, setOpen: React.Dispatch<SetStateAction<boolean>>, fieldId: string, fetchAllExpenses: (fieldId: string) => Promise<void>; }) => {
+
     return (
-        <>
-            {open && <DynamicModal open={open} setOpen={setOpen} title='Merge Fixed Expenses into Expense Pool' btnAction={() => { }} component={<FixedExpenseList fieldId={fieldId} setOpen={setOpen} fetchAllExpenses={fetchAllExpenses} />} />}
-        </>
-    )
+      <>
+        {open && (
+          <DynamicModal
+            open={open}
+            setOpen={setOpen}
+            title="Merge Fixed Expenses into Expense Pool"
+            btnAction={() => {}}
+            component={
+              <FixedExpenseList
+                fieldId={fieldId}
+                setOpen={setOpen}
+                fetchAllExpenses={fetchAllExpenses}
+              />
+            }
+          />
+        )}
+      </>
+    );
 }
 
 export default MergeExpenseModal
@@ -30,10 +45,9 @@ function FixedExpenseList({ fieldId, setOpen, fetchAllExpenses }: { fieldId: str
     const [mergeExpense, setMergeExpense] = useState<tableRow[]>([])
     const [selectedRow, setSelectedRow] = useState([])
     const fetchExpenses = async () => {
-        const field = await dispatch(getField({ token: session?.user?.token || "", fieldType: "Primary" }))
-        const data = await dispatch(getAllExpenses(field?.payload[0]?._id));
-        // console.log(data);
+        const field = await dispatch(getField({ token: session?.user?.token || "", fieldType: "Primary" }));
 
+        const data = await dispatch(getAllExpenses(field?.payload[0]?.expensefields._id));
         if (getAllExpenses.fulfilled.match(data)) {
 
             setExpeses(data?.payload.expensesList)
