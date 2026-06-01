@@ -1,4 +1,5 @@
 "use client";
+import { wakeUpServer } from "@/utils/wakeUpServer";
 import { AnimatePresence } from "framer-motion";
 import * as motion from "framer-motion/client";
 import { SessionProvider, signOut, useSession } from "next-auth/react";
@@ -7,7 +8,7 @@ import { useRouter } from "next/navigation";
 export function Header() {
   const router = useRouter();
   const { data: session } = useSession();
-
+  const isWakeUp = wakeUpServer();
 
   return (
     <SessionProvider>

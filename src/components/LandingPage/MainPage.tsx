@@ -3,9 +3,8 @@ import React from "react";
 import * as motion from "framer-motion/client";
 import { Button } from "@/CommonComponent/UI/moving-border";
 import Link from "next/link";
-import { wakeUpServer } from "@/utils/wakeUpServer";
 const MainPage = () => {
-  const isWakeUp = wakeUpServer();
+
   
   return (
     <main className="w-full min-h-screen flex flex-col items-center overflow-x-hidden overflow-y-hidden">
