@@ -97,6 +97,12 @@ export default function ExpensesTable({ id }: { id: string }) {
         pauseOnHover: true,
         draggable: true,
       });
+      setFormData({
+        desc: "",
+        date: null,
+        category: "",
+        price: NaN,
+      })
     } else {
       toast.error((res.payload as { message: string }).message, {
         position: "top-right",

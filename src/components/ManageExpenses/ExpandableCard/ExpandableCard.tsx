@@ -116,7 +116,7 @@ export function ExpandableCardDemo({
             <motion.div
               onMouseEnter={() => setHoverIndex(idx)}
               onMouseLeave={() => setHoverIndex(null)}
-              layoutId={`card-${card._id}-${card._id}`}
+              layoutId={`card-${card?._id}-${card?._id}`}
               key={`card-${card._id}-${card._id}`}
               onClick={() => router.push(`/expofield/${card._id}`)}
               className=" relative group  block p-2 h-full w-full "

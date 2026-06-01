@@ -1,7 +1,6 @@
 import { expenseFormData } from "@/assets/commanInterface/ComonInterface";
 import CategoryDropdown from "@/CommonComponent/UI/CategoryDropdown";
 import {
-  Autocomplete,
   FormControl,
   InputAdornment,
   TextField
@@ -15,13 +14,6 @@ type Props = {
   formData: expenseFormData;
   setFormData: React.Dispatch<React.SetStateAction<expenseFormData>>;
 };
-
-const categoryOptions = [
-  "Transport",
-  "Food",
-  "Fixed Expense",
-  "Other Expenses",
-];
 
 function AddNewExpense({ formData, setFormData }: Props) {
   const handleCategoryChange = (

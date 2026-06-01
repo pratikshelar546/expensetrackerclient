@@ -12,6 +12,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaRegSave } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { EXPENSE_CATEGORIES } from "@/constants/expenseCategories";
 
 const MobileExpenseSection = ({
   row,
@@ -69,15 +70,11 @@ const MobileExpenseSection = ({
                   }
                   className=" text-white"
                 >
-                  <option value={"Transport"} className=" text-black">
-                    Transport
-                  </option>
-                  <option value={"Food"} className=" text-black">
-                    Food
-                  </option>
-                  <option value={"Other Expenses"} className=" text-black">
-                    Other Expenses
-                  </option>
+                  {EXPENSE_CATEGORIES.map((category) => (
+                    <option key={category} value={category} className="text-black">
+                      {category}
+                    </option>
+                  ))}
                 </NativeSelect>
               ) : (
                 <p>{expense.category}</p>

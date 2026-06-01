@@ -1,6 +1,7 @@
 import React from 'react'
 import { Autocomplete } from '@mui/material'
 import { TextField } from '@mui/material'
+import { EXPENSE_CATEGORIES } from '@/constants/expenseCategories'
 
 const CategoryDropdown = ({
     value,
@@ -9,17 +10,9 @@ const CategoryDropdown = ({
     value: string;
     onChange: (event: React.SyntheticEvent<Element, Event>, value: string | null) => void;
 }) => {
-    // Default categories
-const categoryOptions = [
-    "Transport",
-    "Food",
-    "Fixed Expense",
-    "Other Expenses",
-  ];
   return (
     <Autocomplete
-            freeSolo
-            options={categoryOptions}
+            options={[...EXPENSE_CATEGORIES]}
             value={value || ""}
             onChange={onChange}
             inputValue={value || ""}

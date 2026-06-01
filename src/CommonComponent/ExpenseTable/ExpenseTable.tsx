@@ -1,30 +1,32 @@
 "use client";
 import DynamicModal from "@/CommonComponent/DynamicModal";
 import SignInBtn from "@/CommonComponent/SignInBtn";
-import formatDate from "@/Hooks/useFormatDate";
 import {
     expenseField,
     expenseFormData,
     tableRow,
 } from "@/assets/commanInterface/ComonInterface";
 import AddNewExpense from "@/components/ManageExpenses/AddNewExpense";
+import {
+    CATEGORY_GROUPS,
+    CategoryGroup,
+    EXPENSE_CATEGORIES,
+    getCategoryDotClass,
+    getCategoryGroup,
+} from "@/constants/expenseCategories";
 import { InputAdornment, NativeSelect, TextField } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CiEdit, CiReceipt } from "react-icons/ci";
-import { FaRegSave, FaTag } from "react-icons/fa";
-import { IoIosArrowDown } from "react-icons/io";
-import { IoFastFoodOutline } from "react-icons/io5";
-import { MdDelete, MdEmojiTransportation } from "react-icons/md";
+import { FaRegSave } from "react-icons/fa";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { MdDelete } from "react-icons/md";
 
-// Constants
-const CATEGORY_OPTIONS = ["Transport", "Food", "Other Expenses"] as const;
 const TEXT_FIELD_STYLE = {
     "& .MuiInputBase-input": {
         color: "white",
@@ -39,17 +41,9 @@ const TEXT_FIELD_STYLE = {
     },
 } as const;
 
-// Helper function to get category icon
-const getCategoryIcon = (category: string) => {
-    switch (category) {
-        case "Food":
-            return <IoFastFoodOutline className="w-5 h-5 text-gray-400" />;
-        case "Transport":
-            return <MdEmojiTransportation className="w-5 h-5 text-gray-400" />;
-        default:
-            return <FaTag className="w-4 h-4 text-gray-400" />;
-    }
-};
+function formatShortDate(date: Date | string) {
+    return dayjs(date).format("D MMM");
+}
 
 export default function CommanExpensesTable({
     id,
@@ -57,13 +51,12 @@ export default function CommanExpensesTable({
     row,
     setRow,
     field,
-    setField,
     handleAddExpense,
     formData,
     setFormData,
     handleDeleteField,
     handleUpdateRow,
-    handleDeleteRow
+    handleDeleteRow,
 }: {
     id?: string;
     fetchAllExpenses: (fieldId: string) => Promise<void>;
@@ -72,11 +65,11 @@ export default function CommanExpensesTable({
     field: expenseField;
     setField: (field: expenseField) => void;
     handleAddExpense: () => Promise<void>;
-    formData: expenseFormData,
+    formData: expenseFormData;
     setFormData: React.Dispatch<React.SetStateAction<expenseFormData>>;
     handleDeleteField: (id: string) => void;
     handleUpdateRow: (id: string) => void;
-    handleDeleteRow: (id: string) => void
+    handleDeleteRow: (id: string) => void;
 }) {
     const [editableRow, setEditableRow] = useState<string>("");
     const [openStates, setOpenStates] = useState<string>("");
@@ -84,100 +77,103 @@ export default function CommanExpensesTable({
     const { status } = useSession();
     const router = useRouter();
 
-    // Fetch expenses when authenticated and id is available
     useEffect(() => {
         if (status !== "loading" && id) {
             fetchAllExpenses(id);
         }
     }, [status, id]);
 
-    // Memoize total amount calculation
-    const totalAmount = useMemo(() => {
-        return row?.reduce((sum, { price = 0 }) => sum + (price || 0), 0) || 0;
-    }, [row]);
+    const totalAmount = useMemo(
+        () => row?.reduce((sum, { price = 0 }) => sum + (price || 0), 0) || 0,
+        [row]
+    );
 
-    // Memoize field balance calculation
-    const fieldBalance = useMemo(() => {
-        return (field.RecivedAmount ?? 0) - totalAmount;
-    }, [field.RecivedAmount, totalAmount]);
+    const budget = field.RecivedAmount ?? 0;
+    const budgetUsedPercent = budget > 0 ? Math.min((totalAmount / budget) * 100, 100) : 0;
 
-    // Memoize categories extraction
+    const now = dayjs();
+    const monthLabel = now.format("MMMM YYYY");
+    const monthRange = `${now.startOf("month").format("D MMM")} — ${now.endOf("month").format("D MMM")}`;
+    const fieldTypeLabel = field.fieldType || "Personal";
+
     const categories = useMemo(() => {
-        if (!row || row.length === 0) return [];
+        if (!row?.length) return [];
         const uniqueCategories = new Set<string>();
         row.forEach((item) => {
-            if (item.category) {
-                uniqueCategories.add(item.category);
-            }
+            if (item.category) uniqueCategories.add(item.category);
         });
         return Array.from(uniqueCategories);
     }, [row]);
 
-    // Initialize openStates with first category when categories change
     useEffect(() => {
         if (categories.length > 0 && !openStates) {
             setOpenStates(categories[0]);
         }
     }, [categories, openStates]);
 
-    // Memoize expenses grouped by category for better performance
     const expensesByCategory = useMemo(() => {
         const grouped = new Map<string, tableRow[]>();
         row?.forEach((expense) => {
             const category = expense.category || "Other Expenses";
-            if (!grouped.has(category)) {
-                grouped.set(category, []);
-            }
+            if (!grouped.has(category)) grouped.set(category, []);
             grouped.get(category)!.push(expense);
         });
         return grouped;
     }, [row]);
 
-    // Memoize category statistics
     const categoryStats = useMemo(() => {
         const stats = new Map<string, { count: number; total: number }>();
         categories.forEach((category) => {
             const expenses = expensesByCategory.get(category) || [];
-            const count = expenses.length;
-            const total = expenses.reduce((sum, expense) => sum + (expense.price || 0), 0);
-            stats.set(category, { count, total });
+            stats.set(category, {
+                count: expenses.length,
+                total: expenses.reduce((sum, e) => sum + (e.price || 0), 0),
+            });
         });
         return stats;
     }, [categories, expensesByCategory]);
 
-    // Optimized row change handler with useCallback
-    const handleRowChange = useCallback((id: string, fieldName: keyof tableRow, value: any) => {
-        setRow((prevRows: tableRow[]) =>
-            prevRows.map((row) =>
-                row._id === id ? { ...row, [fieldName]: value } : row
-            )
-        );
-    }, [setRow]);
+    const groupTotals = useMemo(() => {
+        const totals: Record<CategoryGroup, number> = {
+            NEEDS: 0,
+            WANTS: 0,
+            SAVINGS: 0,
+        };
+        row?.forEach((expense) => {
+            const group = getCategoryGroup(expense.category || "Other Expenses");
+            totals[group] += expense.price || 0;
+        });
+        return totals;
+    }, [row]);
 
-    // Optimized edit row handler
-    const handleEditRow = useCallback((id: string) => {
-        setEditableRow((prev) => prev === id ? "" : id);
+    const handleRowChange = useCallback(
+        (rowId: string, fieldName: keyof tableRow, value: unknown) => {
+            setRow((prevRows) =>
+                prevRows.map((r) =>
+                    r._id === rowId ? { ...r, [fieldName]: value } : r
+                )
+            );
+        },
+        [setRow]
+    );
+
+    const handleEditRow = useCallback((rowId: string) => {
+        setEditableRow((prev) => (prev === rowId ? "" : rowId));
     }, []);
 
-    // Toggle category open state
     const toggleCategory = useCallback((category: string) => {
-        setOpenStates((prev) => prev === category ? "" : category);
+        setOpenStates((prev) => (prev === category ? "" : category));
     }, []);
 
-    // Toggle modal
-    const toggleModal = useCallback(() => {
-        setOpen((prev) => !prev);
-    }, []);
+    const toggleModal = useCallback(() => setOpen((prev) => !prev), []);
 
-    // Handle modal close after adding expense
     const handleModalClose = useCallback(async () => {
         await handleAddExpense();
         setOpen(false);
     }, [handleAddExpense]);
 
-    const switchToChatMode = () => {
-        router.push(`/chat/${id}`);
-    }
+    const switchToChatMode = () => router.push(`/chat/${id}`);
+
     return (
         <>
             {open && (
@@ -194,268 +190,354 @@ export default function CommanExpensesTable({
             )}
             {status !== "authenticated" ? (
                 <>
-                    <h1 className="font-bold text-2xl text-white w-full text-center ">
+                    <h1 className="font-bold text-2xl text-white w-full text-center">
                         Sign in first to add expense
                     </h1>
                     <SignInBtn />
                 </>
             ) : (
-                <div className="h-full min-h-screen pt-24 flex flex-col items-center justify-center">
-                    <div className="flex-1 w-full flex flex-col items-center justify-center">
-                        <div className="w-full flex justify-center items-center py-8 flex-col gap-3">
-                            <div className="w-full max-w-7xl px-4 flex justify-between items-center gap-4 mb-4">
-                                <h3 className="text-2xl font-bold text-white text-center">All Expenses</h3>
-                                <button
-                                    onClick={switchToChatMode}
-                                    className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 hover:text-purple-300 rounded-xl transition-all duration-300 border border-purple-500/30"
-                                >
-                                    <span className="text-sm font-medium">💬 Chat Mode</span>
-                                </button>
+                <div className="min-h-screen bg-black text-white pt-20 pb-32">
+                    <div className="mx-auto w-full max-w-6xl px-4">
+                        {/* Header */}
+                        <div className="mb-8 flex items-start justify-between gap-4">
+                            <div>
+                                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                                    {monthLabel}
+                                </h1>
+                                <p className="mt-1 text-sm text-neutral-500">
+                                    {monthRange} · {fieldTypeLabel}
+                                </p>
                             </div>
-                            <div className="flex flex-col gap-8 items-center justify-center w-full max-w-6xl px-4">
-                                {categories.map((category, index) => {
-                                    const stats = categoryStats.get(category);
-                                    const categoryExpenses = expensesByCategory.get(category) || [];
-                                    const isOpen = openStates === category;
-
-                                    return (
-                                        <motion.div
-                                            key={category}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                            className="flex flex-col w-full gap-4 backdrop-blur-lg bg-white/5 p-6 rounded-2xl"
-                                        >
-                                            <button
-                                                onClick={() => toggleCategory(category)}
-                                                className="flex items-center gap-3 text-gray-300 hover:text-white transition-all group"
-                                            >
-                                                <IoIosArrowDown
-                                                    size={"1.5em"}
-                                                    className={`transform transition-all duration-300 ${isOpen ? "rotate-180" : ""
-                                                        } group-hover:scale-110`}
-                                                />
-                                                <h1 className="font-bold text-2xl tracking-tight">
-                                                    {category}
-                                                </h1>
-                                                <span className="text-sm bg-white/10 px-3 py-1 rounded-full">
-                                                    {stats?.count || 0} items - ₹{stats?.total.toLocaleString() || 0}
-                                                </span>
-                                            </button>
-
-                                            <motion.div
-                                                animate={{ height: isOpen ? "auto" : 0 }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 py-4">
-                                                    {categoryExpenses.map((expense) => {
-                                                        const isEditable = expense._id === editableRow;
-                                                        return (
-                                                            <motion.div
-                                                                key={expense._id}
-                                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                                animate={{ opacity: 1, scale: 1 }}
-                                                                exit={{ opacity: 0, scale: 0.95 }}
-                                                                whileHover={{ scale: 1.02 }}
-                                                                className="rounded-xl p-6 bg-gradient-to-br from-neutral-800/50 to-neutral-900/50 backdrop-blur border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300"
-                                                            >
-                                                                <div className="flex flex-col space-y-4">
-                                                                    <div className="flex items-start justify-between">
-                                                                        <div className="flex items-center space-x-4">
-                                                                            <div className="p-3 bg-blue-500/20 rounded-xl backdrop-blur-sm">
-                                                                                <CiReceipt className="w-6 h-6 text-blue-400" />
-                                                                            </div>
-                                                                            <div>
-                                                                                {isEditable ? (
-                                                                                    <input
-                                                                                        value={expense.desc}
-                                                                                        onChange={(e) =>
-                                                                                            handleRowChange(
-                                                                                                expense._id,
-                                                                                                "desc",
-                                                                                                e.target.value
-                                                                                            )
-                                                                                        }
-                                                                                        className="w-full text-lg bg-transparent border-b-2 border-blue-500/30 focus:border-blue-500 text-white outline-none transition-all"
-                                                                                        placeholder="Description"
-                                                                                    />
-                                                                                ) : (
-                                                                                    <h3 className="text-xl font-semibold text-white">
-                                                                                        {expense.desc}
-                                                                                    </h3>
-                                                                                )}
-                                                                                <div className="flex items-center mt-2 space-x-2">
-                                                                                    {getCategoryIcon(expense.category)}
-
-                                                                                    {isEditable ? (
-                                                                                        <NativeSelect
-                                                                                            name="category"
-                                                                                            value={expense.category}
-                                                                                            onChange={(e) =>
-                                                                                                handleRowChange(
-                                                                                                    expense._id,
-                                                                                                    "category",
-                                                                                                    e.target.value
-                                                                                                )
-                                                                                            }
-                                                                                            className="text-sm bg-transparent text-white border-none outline-none"
-                                                                                        >
-                                                                                            {CATEGORY_OPTIONS.map((option) => (
-                                                                                                <option
-                                                                                                    key={option}
-                                                                                                    value={option}
-                                                                                                    className="text-black"
-                                                                                                >
-                                                                                                    {option}
-                                                                                                </option>
-                                                                                            ))}
-                                                                                        </NativeSelect>
-                                                                                    ) : (
-                                                                                        <span className="text-sm text-gray-400">
-                                                                                            {expense.category}
-                                                                                        </span>
-                                                                                    )}
-                                                                                </div>
-                                                                                <div className="mt-2">
-                                                                                    <span className="text-xs text-gray-500">
-                                                                                        By: {expense.userName}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div className="flex gap-2">
-                                                                            {isEditable ? (
-                                                                                <button
-                                                                                    onClick={() =>
-                                                                                        handleUpdateRow(expense._id)
-                                                                                    }
-                                                                                    className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
-                                                                                >
-                                                                                    <FaRegSave className="w-5 h-5 text-blue-400" />
-                                                                                </button>
-                                                                            ) : (
-                                                                                <button
-                                                                                    onClick={() =>
-                                                                                        handleEditRow(expense._id)
-                                                                                    }
-                                                                                    className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors"
-                                                                                >
-                                                                                    <CiEdit className="w-5 h-5 text-blue-400" />
-                                                                                </button>
-                                                                            )}
-                                                                            <button
-                                                                                onClick={() =>
-                                                                                    handleDeleteRow(expense._id)
-                                                                                }
-                                                                                className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
-                                                                            >
-                                                                                <MdDelete className="w-5 h-5 text-red-400" />
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div className="flex justify-between items-end pt-4 border-t border-white/10">
-                                                                        {isEditable ? (
-                                                                            <LocalizationProvider
-                                                                                dateAdapter={AdapterDayjs}
-                                                                            >
-                                                                                <DatePicker
-                                                                                    sx={TEXT_FIELD_STYLE}
-                                                                                    format="DD/MM/YYYY"
-                                                                                    className="w-36"
-                                                                                    value={dayjs(new Date(expense.date))}
-                                                                                    onChange={(newValue) =>
-                                                                                        handleRowChange(
-                                                                                            expense._id,
-                                                                                            "date",
-                                                                                            newValue
-                                                                                        )
-                                                                                    }
-                                                                                />
-                                                                            </LocalizationProvider>
-                                                                        ) : (
-                                                                            <p className="text-sm text-gray-400">
-                                                                                {formatDate(new Date(expense.date))}
-                                                                            </p>
-                                                                        )}
-                                                                        {isEditable ? (
-                                                                            <TextField
-                                                                                type="number"
-                                                                                value={
-                                                                                    expense.price === 0 ? "" : expense.price
-                                                                                }
-                                                                                sx={TEXT_FIELD_STYLE}
-                                                                                InputProps={{
-                                                                                    startAdornment: (
-                                                                                        <InputAdornment position="start">
-                                                                                            <span className="text-white">
-                                                                                                ₹
-                                                                                            </span>
-                                                                                        </InputAdornment>
-                                                                                    ),
-                                                                                }}
-                                                                                onChange={(e) =>
-                                                                                    handleRowChange(
-                                                                                        expense._id,
-                                                                                        "price",
-                                                                                        Number(e.target.value)
-                                                                                    )
-                                                                                }
-                                                                                fullWidth
-                                                                            />
-                                                                        ) : (
-                                                                            <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
-                                                                                ₹{expense?.price?.toFixed(2)}
-                                                                            </p>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </motion.div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </motion.div>
-                                        </motion.div>
-                                    );
-                                })}
-                                {categories?.length <= 0 && (
-                                    <>
-                                        <h1 className="text-white text-3xl text-center">
-                                            No expense found{" "}
-                                        </h1>
-                                    </>
-                                )}
+                            <div className="text-right">
+                                <p className="text-3xl font-bold sm:text-4xl">
+                                    ₹{totalAmount.toLocaleString("en-IN")}
+                                </p>
+                                <p className="text-sm text-neutral-500">
+                                    of ₹{budget.toLocaleString("en-IN")} budget
+                                </p>
+                                <div className="mt-2 h-1 w-28 overflow-hidden rounded-full bg-neutral-800 sm:w-36">
+                                    <div
+                                        className="h-full rounded-full bg-white transition-all duration-500"
+                                        style={{ width: `${budgetUsedPercent}%` }}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="w-full pb-8 backdrop-blur-xl bg-black/30 border-t border-white/10 p-6">
-                            <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-                                <div className="flex items-center gap-4">
-                                    {fieldBalance && (
-                                        <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl">
-                                            <span className="text-gray-400">Balance:</span>
-                                            <span className="text-xl font-bold text-white">
-                                                ₹{fieldBalance}
+                        {/* Chat mode link */}
+                        <div className="mb-6 flex justify-end">
+                            <button
+                                onClick={switchToChatMode}
+                                className="rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-medium text-purple-400 transition hover:bg-purple-500/20"
+                            >
+                                💬 Chat Mode
+                            </button>
+                        </div>
+
+                        {/* Category accordions */}
+                        <div className="flex flex-col gap-1">
+                            {categories.map((category) => {
+                                const stats = categoryStats.get(category);
+                                const categoryExpenses =
+                                    expensesByCategory.get(category) || [];
+                                const isOpen = openStates === category;
+                                const dotClass = getCategoryDotClass(category);
+
+                                return (
+                                    <div
+                                        key={category}
+                                        className="border-b border-neutral-800/80"
+                                    >
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleCategory(category)}
+                                            className="flex w-full items-center gap-3 py-4 text-left"
+                                        >
+                                            <span
+                                                className={`h-2 w-2 shrink-0 rounded-full ${dotClass}`}
+                                            />
+                                            <span className="flex-1 text-base font-medium text-white">
+                                                {category}
                                             </span>
+                                            <span className="text-sm text-neutral-500">
+                                                {stats?.count || 0}{" "}
+                                                {(stats?.count || 0) === 1
+                                                    ? "expense"
+                                                    : "expenses"}
+                                            </span>
+                                            <span className="min-w-[3rem] text-right text-base font-medium">
+                                                ₹
+                                                {(stats?.total || 0).toLocaleString(
+                                                    "en-IN"
+                                                )}
+                                            </span>
+                                            {isOpen ? (
+                                                <IoIosArrowUp className="ml-1 text-neutral-400" />
+                                            ) : (
+                                                <IoIosArrowDown className="ml-1 text-neutral-400" />
+                                            )}
+                                        </button>
+
+                                        {isOpen && (
+                                            <div className="grid grid-cols-1 gap-4 pb-6 sm:grid-cols-2 lg:grid-cols-3">
+                                                {categoryExpenses.map((expense) => {
+                                                    const isEditable =
+                                                        expense._id === editableRow;
+                                                    return (
+                                                        <div
+                                                            key={expense._id}
+                                                            className="group rounded-xl border border-white/10 bg-gradient-to-br from-neutral-800/50 to-neutral-900/50 p-4 shadow-lg transition hover:border-white/20"
+                                                        >
+                                                            <div className="flex items-start justify-between gap-2">
+                                                                <div className="flex min-w-0 flex-1 items-start gap-3">
+                                                                    <div className="shrink-0 rounded-lg bg-blue-500/20 p-2">
+                                                                        <CiReceipt className="h-5 w-5 text-blue-400" />
+                                                                    </div>
+                                                                    <div className="min-w-0 flex-1">
+                                                                        {isEditable ? (
+                                                                            <>
+                                                                                <input
+                                                                                    value={
+                                                                                        expense.desc
+                                                                                    }
+                                                                                    onChange={(e) =>
+                                                                                        handleRowChange(
+                                                                                            expense._id,
+                                                                                            "desc",
+                                                                                            e.target
+                                                                                                .value
+                                                                                        )
+                                                                                    }
+                                                                                    className="w-full border-b border-neutral-600 bg-transparent text-sm text-white outline-none"
+                                                                                    placeholder="Description"
+                                                                                />
+                                                                                <NativeSelect
+                                                                                    value={
+                                                                                        expense.category
+                                                                                    }
+                                                                                    onChange={(e) =>
+                                                                                        handleRowChange(
+                                                                                            expense._id,
+                                                                                            "category",
+                                                                                            e.target
+                                                                                                .value
+                                                                                        )
+                                                                                    }
+                                                                                    className="mt-2 w-full text-xs text-neutral-400"
+                                                                                >
+                                                                                    {EXPENSE_CATEGORIES.map(
+                                                                                        (opt) => (
+                                                                                            <option
+                                                                                                key={
+                                                                                                    opt
+                                                                                                }
+                                                                                                value={
+                                                                                                    opt
+                                                                                                }
+                                                                                            >
+                                                                                                {opt}
+                                                                                            </option>
+                                                                                        )
+                                                                                    )}
+                                                                                </NativeSelect>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <p className="truncate text-base font-semibold text-white">
+                                                                                    {expense.desc}
+                                                                                </p>
+                                                                                <p className="mt-1 text-xs text-neutral-500">
+                                                                                    {formatShortDate(
+                                                                                        expense.date
+                                                                                    )}{" "}
+                                                                                    ·{" "}
+                                                                                    {expense.userName ||
+                                                                                        "—"}
+                                                                                </p>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex shrink-0 gap-1">
+                                                                    {isEditable ? (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() =>
+                                                                                handleUpdateRow(
+                                                                                    expense._id
+                                                                                )
+                                                                            }
+                                                                            className="p-1.5 text-blue-400 hover:text-blue-300"
+                                                                        >
+                                                                            <FaRegSave className="h-4 w-4" />
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() =>
+                                                                                handleEditRow(
+                                                                                    expense._id
+                                                                                )
+                                                                            }
+                                                                            className="p-1.5 text-neutral-500 opacity-0 transition group-hover:opacity-100 hover:text-white"
+                                                                        >
+                                                                            <CiEdit className="h-4 w-4" />
+                                                                        </button>
+                                                                    )}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            handleDeleteRow(
+                                                                                expense._id
+                                                                            )
+                                                                        }
+                                                                        className="p-1.5 text-neutral-500 opacity-0 transition group-hover:opacity-100 hover:text-red-400"
+                                                                    >
+                                                                        <MdDelete className="h-4 w-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <div className="mt-4 flex items-end justify-between border-t border-white/10 pt-3">
+                                                                {isEditable ? (
+                                                                    <LocalizationProvider
+                                                                        dateAdapter={
+                                                                            AdapterDayjs
+                                                                        }
+                                                                    >
+                                                                        <DatePicker
+                                                                            sx={TEXT_FIELD_STYLE}
+                                                                            format="DD/MM/YYYY"
+                                                                            className="max-w-[8rem]"
+                                                                            value={dayjs(
+                                                                                new Date(
+                                                                                    expense.date
+                                                                                )
+                                                                            )}
+                                                                            onChange={(newValue) =>
+                                                                                handleRowChange(
+                                                                                    expense._id,
+                                                                                    "date",
+                                                                                    newValue
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </LocalizationProvider>
+                                                                ) : (
+                                                                    <span className="text-xs text-neutral-500">
+                                                                        {formatShortDate(
+                                                                            expense.date
+                                                                        )}
+                                                                    </span>
+                                                                )}
+                                                                {isEditable ? (
+                                                                    <TextField
+                                                                        type="number"
+                                                                        size="small"
+                                                                        value={
+                                                                            expense.price === 0
+                                                                                ? ""
+                                                                                : expense.price
+                                                                        }
+                                                                        sx={TEXT_FIELD_STYLE}
+                                                                        InputProps={{
+                                                                            startAdornment: (
+                                                                                <InputAdornment position="start">
+                                                                                    <span className="text-white">
+                                                                                        ₹
+                                                                                    </span>
+                                                                                </InputAdornment>
+                                                                            ),
+                                                                        }}
+                                                                        onChange={(e) =>
+                                                                            handleRowChange(
+                                                                                expense._id,
+                                                                                "price",
+                                                                                Number(
+                                                                                    e.target.value
+                                                                                )
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                ) : (
+                                                                    <p className="text-lg font-bold text-white">
+                                                                        ₹
+                                                                        {(
+                                                                            expense.price || 0
+                                                                        ).toLocaleString(
+                                                                            "en-IN"
+                                                                        )}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                            {categories.length === 0 && (
+                                <p className="py-12 text-center text-neutral-500">
+                                    No expenses yet
+                                </p>
+                            )}
+                        </div>
+
+                        {/* NEEDS / WANTS / SAVINGS summary cards */}
+                        <div className="mt-8 grid grid-cols-3 gap-3">
+                            {(Object.keys(CATEGORY_GROUPS) as CategoryGroup[]).map(
+                                (group) => {
+                                    const config = CATEGORY_GROUPS[group];
+                                    const groupBudget = Math.round(
+                                        budget * config.budgetShare
+                                    );
+                                    const spent = groupTotals[group];
+                                    const dotClass = config.dotClass;
+
+                                    return (
+                                        <div
+                                            key={group}
+                                            className="rounded-2xl border border-neutral-800 bg-neutral-900/50 px-3 py-4"
+                                        >
+                                            <div className="mb-2 flex items-center gap-1.5">
+                                                <span
+                                                    className={`h-1.5 w-1.5 rounded-full ${dotClass}`}
+                                                />
+                                                <span className="text-[10px] font-medium tracking-wider text-neutral-500">
+                                                    {group}
+                                                </span>
+                                            </div>
+                                            <p className="text-lg font-bold sm:text-xl">
+                                                ₹{spent.toLocaleString("en-IN")}
+                                            </p>
+                                            <p className="mt-1 text-xs text-neutral-500">
+                                                of ₹
+                                                {groupBudget.toLocaleString("en-IN")}
+                                            </p>
                                         </div>
-                                    )}
-                                
-                                </div>
-                                <div className="flex gap-4">
-                                    <button
-                                        onClick={() => handleDeleteField(field._id)}
-                                        className="px-6 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300"
-                                    >
-                                        Delete Field
-                                    </button>
-                                    <button
-                                        onClick={toggleModal}
-                                        className="px-6 py-2 rounded-xl bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-300"
-                                    >
-                                        Add Expense
-                                    </button>
-                                </div>
+                                    );
+                                }
+                            )}
+                        </div>
+
+                        {/* Footer actions — unchanged */}
+                        <div className="fixed bottom-0 left-0 right-0 border-t border-neutral-800 bg-black/95 px-4 py-4 backdrop-blur">
+                            <div className="mx-auto flex max-w-6xl justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteField(field._id)}
+                                    className="rounded-xl bg-red-500/20 px-5 py-2 text-sm text-red-400 transition hover:bg-red-500 hover:text-white"
+                                >
+                                    Delete Field
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={toggleModal}
+                                    className="rounded-xl bg-blue-500/20 px-5 py-2 text-sm text-blue-400 transition hover:bg-blue-500 hover:text-white"
+                                >
+                                    Add Expense
+                                </button>
                             </div>
                         </div>
                     </div>
