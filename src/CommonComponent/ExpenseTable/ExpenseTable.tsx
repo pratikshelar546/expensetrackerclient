@@ -26,6 +26,7 @@ import { CiEdit, CiReceipt } from "react-icons/ci";
 import { FaRegSave } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
+import TeamBadge from "@/CommonComponent/UI/TeamBadge";
 
 const TEXT_FIELD_STYLE = {
     "& .MuiInputBase-input": {
@@ -201,11 +202,15 @@ export default function CommanExpensesTable({
                         {/* Header */}
                         <div className="mb-8 flex items-start justify-between gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                                    {monthLabel}
-                                </h1>
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                                        {field.fieldName || monthLabel}
+                                    </h1>
+                                    {field.fieldType === "Team" && <TeamBadge />}
+                                </div>
                                 <p className="mt-1 text-sm text-neutral-500">
                                     {monthRange} · {fieldTypeLabel}
+                                    {field.fieldType === "Team" && " · Shared group expenses"}
                                 </p>
                             </div>
                             <div className="text-right">

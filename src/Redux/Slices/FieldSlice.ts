@@ -15,21 +15,25 @@ interface updateField {
 
 export const createField = createAsyncThunk(
   "field/createField",
-  async ({ data, token }: { data: addField, token?: string }) => {
-
+  async (
+    { data, token }: { data: addField; token?: string },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await apiClient({
         method: "POST",
         url: "field/createField",
         data,
         headers: {
-          Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
+          Authorization: `Bearer ${token}`,
         },
       });
 
       return response.data.response._id;
     } catch (error: any) {
-      throw error.response.data.message || error.message;
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );

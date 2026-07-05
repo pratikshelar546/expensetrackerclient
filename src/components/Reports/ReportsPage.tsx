@@ -47,7 +47,9 @@ const ReportsPage = () => {
       generateReport({
         token,
         fieldIds: config.fieldIds,
-        includeTeamPools: config.includeTeamPools,
+        includeTeamPools:
+          config.scope === "custom" ? config.includeTeamPools : false,
+        scope: config.scope,
       })
     );
 

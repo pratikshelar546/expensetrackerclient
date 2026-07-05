@@ -22,6 +22,9 @@ const ReportConfigForm: React.FC<ReportConfigFormProps> = ({
   const [scope, setScope] = useState<ReportScope>("overall");
   const [includeTeamPools, setIncludeTeamPools] = useState(false);
 
+  const isTeamPool = (pool: expenseField) =>
+    String(pool.fieldType || "").toLowerCase() === "team";
+
   const availablePools = useMemo(() => {
     return pools
       .map((item) => item.expensefields)
@@ -30,7 +33,7 @@ const ReportConfigForm: React.FC<ReportConfigFormProps> = ({
 
   const defaultSelectedIds = useMemo(() => {
     return availablePools
-      .filter((pool) => includeTeamPools || pool.fieldType !== "Team")
+      .filter((pool) => includeTeamPools || !isTeamPool(pool))
       .map((pool) => pool._id);
   }, [availablePools, includeTeamPools]);
 
@@ -42,7 +45,7 @@ const ReportConfigForm: React.FC<ReportConfigFormProps> = ({
 
   const selectablePools = useMemo(() => {
     return availablePools.filter(
-      (pool) => includeTeamPools || pool.fieldType !== "Team"
+      (pool) => includeTeamPools || !isTeamPool(pool)
     );
   }, [availablePools, includeTeamPools]);
 
@@ -66,7 +69,7 @@ const ReportConfigForm: React.FC<ReportConfigFormProps> = ({
     <div className="w-full rounded-2xl border border-slate-800 bg-zinc-950 p-6 shadow-xl">
       <h2 className="text-2xl font-bold text-white">Generate Expense Report</h2>
       <p className="mt-2 text-sm text-gray-400">
-        Choose which pools to include. Team pools are excluded by default.
+        Overall reports exclude team pools. Use custom scope to include them.
       </p>
 
       <div className="mt-6 space-y-4">
@@ -88,7 +91,9 @@ const ReportConfigForm: React.FC<ReportConfigFormProps> = ({
                 onChange={() => setScope("overall")}
                 className="accent-cyan-500"
               />
-              <span className="text-white">Overall (all eligible pools)</span>
+              <span className="text-white">
+                Overall (personal pools only, no team)
+              </span>
             </label>
             <label
               className={cn(
@@ -110,17 +115,19 @@ const ReportConfigForm: React.FC<ReportConfigFormProps> = ({
           </div>
         </div>
 
-        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-700 bg-black px-4 py-3">
-          <input
-            type="checkbox"
-            checked={includeTeamPools}
-            onChange={(e) => setIncludeTeamPools(e.target.checked)}
-            className="accent-cyan-500"
-          />
-          <span className="text-sm text-gray-300">
-            Include group (team) expense pools
-          </span>
-        </label>
+        {scope === "custom" && (
+          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-700 bg-black px-4 py-3">
+            <input
+              type="checkbox"
+              checked={includeTeamPools}
+              onChange={(e) => setIncludeTeamPools(e.target.checked)}
+              className="accent-cyan-500"
+            />
+            <span className="text-sm text-gray-300">
+              Include team expense pools
+            </span>
+          </label>
+        )}
 
         {scope === "custom" && (
           <div className="rounded-lg border border-slate-800 bg-black p-4">
@@ -151,7 +158,9 @@ const ReportConfigForm: React.FC<ReportConfigFormProps> = ({
         disabled={
           isLoading ||
           (scope === "custom" && selectedPoolIds.length === 0) ||
-          selectablePools.length === 0
+          (scope === "custom" && selectablePools.length === 0) ||
+          (scope === "overall" &&
+            availablePools.filter((pool) => !isTeamPool(pool)).length === 0)
         }
         className="mt-6 w-full rounded-md bg-gradient-to-br from-cyan-600 to-blue-700 py-3 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
       >

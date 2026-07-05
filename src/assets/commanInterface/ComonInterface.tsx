@@ -41,7 +41,7 @@ export interface addField {
   RecivedAmount?: string;
   fieldType?: string;
   expiry?: string;
-  email?: string;
+  memberEmails?: string[];
 }
 
 export interface ReportPoolRow {

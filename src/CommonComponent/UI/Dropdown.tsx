@@ -7,10 +7,11 @@ export interface DropdownProps
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
   options: Array<{ value: string }>;
   setField: React.Dispatch<React.SetStateAction<{}>>;
+  value?: string;
 }
 
 const Dropdown = React.forwardRef<HTMLInputElement, DropdownProps>(
-  ({ className, options, setField, ...props }, ref) => {
+  ({ className, options, setField, value, ...props }, ref) => {
     const radius = 90; // change this to increase the rdaius of the hover effect
     const [visible, setVisible] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -26,7 +27,13 @@ const Dropdown = React.forwardRef<HTMLInputElement, DropdownProps>(
     }
 
     const [isOpen, setIsOpen] = React.useState(false);
-    const [selected, setSelected] = React.useState<string | null>(null);
+    const [selected, setSelected] = React.useState<string | null>(value || "Personal");
+
+    React.useEffect(() => {
+      if (value) {
+        setSelected(value);
+      }
+    }, [value]);
 
     const handleSelect = (value: string) => {
       setField((prev) => ({ ...prev, fieldType: value }));

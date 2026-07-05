@@ -6,6 +6,7 @@ import { expenseField, expenseFieldData } from "@/assets/commanInterface/ComonIn
 import ExpensesTable from "../ExpensesTable";
 import { useRouter } from "next/navigation";
 import EmptyState from "@/CommonComponent/UI/EmptyState";
+import TeamBadge from "@/CommonComponent/UI/TeamBadge";
 
 export function ExpandableCardDemo({
   field,
@@ -126,9 +127,10 @@ export function ExpandableCardDemo({
                   <div className="flex justify-between flex-col h-full">
                     <motion.h3
                       layoutId={`title-${card.fieldName}-${card._id}`}
-                      className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
+                      className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left flex flex-wrap items-center gap-2"
                     >
                       Field Name: {card.fieldName}
+                      {card.fieldType === "Team" && <TeamBadge />}
                     </motion.h3>
                     <motion.p
                       layoutId={`description-${card.RecivedAmount}-${card._id}`}

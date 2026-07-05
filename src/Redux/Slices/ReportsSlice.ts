@@ -6,16 +6,22 @@ interface GenerateReportPayload {
   token?: string;
   fieldIds?: string[];
   includeTeamPools?: boolean;
+  scope?: "overall" | "custom";
 }
 
 export const generateReport = createAsyncThunk(
   "reports/generateReport",
-  async ({ token, fieldIds = [], includeTeamPools = false }: GenerateReportPayload) => {
+  async ({
+    token,
+    fieldIds = [],
+    includeTeamPools = false,
+    scope = "overall",
+  }: GenerateReportPayload) => {
     try {
       const response = await apiClient({
         method: "POST",
         url: "reports/generate",
-        data: { fieldIds, includeTeamPools },
+        data: { fieldIds, includeTeamPools, scope },
         headers: {
           Authorization: `Bearer ${token}`,
         },
