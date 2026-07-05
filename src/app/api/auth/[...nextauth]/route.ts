@@ -7,28 +7,33 @@ import { API_URL } from "@/config/api";
 
 export interface session extends Session {
   user: {
-    name: string,
-    email: string,
-    id: string,
-    token: string
-  }
-}
-interface token extends JWT {
-  jwtToken: string
-  id: string
+    name: string;
+    email: string;
+    id: string;
+    token: string;
+  };
 }
 
-const createToken = async (user: User) => {
-  try {
-    const response = await axios.post(
-      `${API_URL}user/auth`,
-      user
-    );
 
-    return response.data.token;
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+
+interface BackendAuthResponse {
+  token: string;
+  userId: string;
+}
+
+const authenticateWithBackend = async (user: {
+  name?: string | null;
+  email?: string | null;
+}): Promise<BackendAuthResponse> => {
+  const response = await axios.post(`${API_URL}user/auth`, {
+    name: user.name,
+    email: user.email,
+  });
+
+  return {
+    token: response.data.token,
+    userId: response.data.userId,
+  };
 };
 
 const authOptions: AuthOptions = {
@@ -37,56 +42,59 @@ const authOptions: AuthOptions = {
   },
   providers: [
     GoogleProvider({
-      name: 'google',
+      name: "google",
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: 'email', type: 'text', placeholder: '' },
-        password: { label: 'password', type: 'password', placeholder: '' },
+        username: { label: "email", type: "text", placeholder: "" },
+        password: { label: "password", type: "password", placeholder: "" },
       },
       async authorize(credentials: any) {
         try {
-          if (!credentials.username || !credentials.password) return;
-          const data = {
-            email: credentials.username,
-            password: credentials.password
-          }
+          if (!credentials.username || !credentials.password) return null;
 
-          const loginuser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || API_URL}user/signin`, data)
-          return loginuser.data.user
+          const loginuser = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL || API_URL}user/signin`,
+            {
+              email: credentials.username,
+              password: credentials.password,
+            }
+          );
+
+          return {
+            ...loginuser.data.user,
+            apiToken: loginuser.data.token,
+          };
         } catch (error: any) {
-          console.error("Authorize error:", error.response?.data || error.message);
-          return error?.data
+          console.error(
+            "Authorize error:",
+            error.response?.data || error.message
+          );
+          return null;
         }
-      }
-
-    })
+      },
+    }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ account }) {
       if (account?.provider === "google") {
-        try {
-          await axios.post(`${API_URL}user/auth`, user);
-          return true;
-        } catch (error: any) {
-          console.log("SignIn Error:", error.message);
-          return false;
-        }
+        return true;
       }
       return true;
     },
     async jwt({ token, user, account }) {
-      // Persist userId from the user object into the JWT, so we can attach it to session.user below.
       if (user && account) {
         try {
-          token.jwtToken = await createToken(user);
-          // Attach userId if exists (for both Google and Credentials sign-in)
-          if (user) {
-            // @ts-ignore
-            token.id= user?.userId as string;
+          if (account.provider === "google") {
+            const auth = await authenticateWithBackend(user);
+            token.jwtToken = auth.token;
+            token.id = auth.userId;
+          } else if (account.provider === "credentials") {
+            token.jwtToken = (user as User & { apiToken?: string }).apiToken;
+            token.id = (user as User & { userId?: string }).userId as string;
           }
         } catch (error: any) {
           console.error("JWT Error:", error.message);
@@ -94,11 +102,9 @@ const authOptions: AuthOptions = {
       }
       return token;
     },
-
-    // Attach the JWT token and userId to the session
     session: async ({ session, token }) => {
       const newSession: session = session as session;
-      if (newSession.user) {        
+      if (newSession.user) {
         newSession.user.token = token.jwtToken as string;
         newSession.user.id = token.id as string;
       }
@@ -110,4 +116,3 @@ const authOptions: AuthOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
-

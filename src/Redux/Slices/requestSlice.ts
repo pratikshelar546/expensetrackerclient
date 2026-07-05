@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import apiClient from "@/utils/apiClient";
 
 export interface RequestState {
   requests: any[];
@@ -32,8 +32,8 @@ export const addMember = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}request/addMember/${fieldId}`,
+      const response = await apiClient.post(
+        `request/addMember/${fieldId}`,
         {
           email
         },
@@ -58,8 +58,8 @@ export const acceptRequest = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}request/acceptRequest/${reqId}`,
+      const response = await apiClient.post(
+        `request/acceptRequest/${reqId}`,
         {},
         {
           headers: {
@@ -82,8 +82,8 @@ export const rejectRequest = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}request/rejectRequest/${reqId}`,
+      const response = await apiClient.post(
+        `request/rejectRequest/${reqId}`,
         {},
         {
           headers: {
@@ -103,9 +103,7 @@ export const fetchAllRequests = createAsyncThunk(
   "request/fetchAllRequests",
   async ({ token }: { token?: string }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}request/getAllRequest`,
-        {
+      const response = await apiClient.get("request/getAllRequest", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

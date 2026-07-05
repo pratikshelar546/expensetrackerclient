@@ -10,7 +10,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridRowId } from '@mui/x-da
 import formatDate from '@/Hooks/useFormatDate'
 import { FaPlus } from 'react-icons/fa'
 import { IoRemove } from 'react-icons/io5'
-import axios from 'axios'
+import apiClient from '@/utils/apiClient'
 import { toast } from 'react-toastify'
 const MergeExpenseModal = ({ open, setOpen, fieldId, fetchAllExpenses }: { open: boolean, setOpen: React.Dispatch<SetStateAction<boolean>>, fieldId: string, fetchAllExpenses: (fieldId: string) => Promise<void>; }) => {
 
@@ -128,7 +128,7 @@ function FixedExpenseList({ fieldId, setOpen, fetchAllExpenses }: { fieldId: str
             fieldId: fieldId,
             expenseList: selectedRow
         }
-        const mergedExpenses = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}expenses/mergeExpense`, data)
+        const mergedExpenses = await apiClient.post("expenses/mergeExpense", data)
         console.log(mergedExpenses);
         if (mergedExpenses.data.success) {
 

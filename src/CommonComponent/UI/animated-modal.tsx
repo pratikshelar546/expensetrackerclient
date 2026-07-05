@@ -101,6 +101,10 @@ export const ModalBody = ({
     } else {
       document.body.style.overflow = "auto";
     }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
   }, [open]);
 
   const modalRef = useRef(null);
@@ -122,14 +126,14 @@ export const ModalBody = ({
             opacity: 0,
             backdropFilter: "blur(0px)",
           }}
-          className="fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full  flex items-center justify-center z-50"
+          className="fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full flex items-start sm:items-center justify-center z-50 overflow-y-auto overscroll-contain py-4 px-2"
         >
           <Overlay />
 
           <motion.div
             ref={modalRef}
             className={cn(
-              "dark max-h-[90%] md:max-w-[30%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 overflow-hidden m-4",
+              "dark w-full max-w-lg md:max-w-[30%] max-h-[calc(100dvh-2rem)] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col overflow-y-auto overflow-x-hidden my-auto mx-4",
               className
             )}
             initial={{
@@ -173,7 +177,7 @@ export const ModalContent = ({
 }) => {
   return (
     <div
-      className={cn("flex flex-col flex-1 p-8 md:p-5 bg-zinc-950", className)}
+      className={cn("flex flex-col flex-1 min-h-0 p-8 md:p-5 bg-zinc-950", className)}
     >
       {children}
     </div>
@@ -245,16 +249,38 @@ const CloseIcon = () => {
   );
 };
 
+const MUI_PICKER_SELECTORS = [
+  ".MuiPickersPopper-root",
+  ".MuiDialog-root",
+  ".MuiPopover-root",
+  ".MuiPickersLayout-root",
+  ".MuiDateCalendar-root",
+  ".MuiPickersDay-root",
+  ".MuiPickersCalendarHeader-root",
+  ".MuiPickersArrowSwitcher-root",
+  ".MuiPickersYear-root",
+  ".MuiPickersMonth-root",
+].join(",");
+
+const isMuiPickerInteraction = (target: EventTarget | null) => {
+  if (!(target instanceof Element)) return false;
+  return Boolean(target.closest(MUI_PICKER_SELECTORS));
+};
+
 // Hook to detect clicks outside of a component.
 // Add it in a separate file, I've added here for simplicity
 export const useOutsideClick = (
   ref: React.RefObject<HTMLDivElement>,
   callback: Function
-) => {  
+) => {
   useEffect(() => {
-    const listener = (event: any) => {      
-      // DO NOTHING if the element being clicked is the target element or their children
-      if (!ref.current || ref.current.contains(event.target) || event.target.closest('.MuiPickersPopper-root')) {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      const target = event.target;
+      if (
+        !ref.current ||
+        ref.current.contains(target as Node) ||
+        isMuiPickerInteraction(target)
+      ) {
         return;
       }
       callback(event);

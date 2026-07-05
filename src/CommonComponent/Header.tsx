@@ -37,6 +37,9 @@ export function Header() {
               <button onClick={() => router.push("/expensepool")} className=" cursor-pointer">
                 Expense Pool
               </button>
+              <button onClick={() => router.push("/reports")} className=" cursor-pointer">
+                Reports
+              </button>
               {session?.user ? <button onClick={() => signOut()}>Signout</button> : <button className="outline-none border-none" onClick={() => router.push("/login")}>Login</button>}
             </div>
           </div>

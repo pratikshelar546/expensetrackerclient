@@ -43,3 +43,19 @@ export interface addField {
   expiry?: string;
   email?: string;
 }
+
+export interface ReportPoolRow {
+  fieldId: string;
+  fieldName: string;
+  fieldType: string;
+  categoryTotals: Record<string, number>;
+  rowTotal: number;
+}
+
+export interface ExpenseReportData {
+  pools: ReportPoolRow[];
+  columnTotals: Record<string, number>;
+  grandTotal: number;
+}
+
+export type ReportScope = "overall" | "custom";

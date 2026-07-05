@@ -3,7 +3,7 @@ import {
   tableRow,
 } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import apiClient from "@/utils/apiClient";
 
 interface updateExpensePayload {
   data: expenseFormData;
@@ -17,9 +17,9 @@ export const getAllExpenses = createAsyncThunk(
   "expenses/getExpenses",
   async (id: string) => {
     try {
-      const response = await axios<{ expensesList: tableRow[] }>({
+      const response = await apiClient<{ expensesList: tableRow[] }>({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/${id}`,
+        url: `expenses/${id}`,
       });
 
       return response.data;
@@ -33,9 +33,9 @@ export const addExpense = createAsyncThunk(
   "expenses/addExpenses",
   async ({ data, id ,token}: updateExpensePayload) => {
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "POST",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/add-expense/${id}`,
+        url: `field/add-expense/${id}`,
         data,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -52,9 +52,9 @@ export const updateExpense = createAsyncThunk(
   "expenses/updateExpenses",
   async ({ data, id }: updateExpensePayload) => {
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "PUT",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/updateExpense/${id}`,
+        url: `expenses/updateExpense/${id}`,
         data,
       });
       return response.data;
@@ -68,9 +68,9 @@ export const deleteExpenses = createAsyncThunk(
   "expense/DeleteExpense",
   async (id: String) => {
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "DELETE",
-        url: `${process.env.NEXT_PUBLIC_API_URL}expenses/deleteExpense/${id}`,
+        url: `expenses/deleteExpense/${id}`,
       });
       return response.data;
     } catch (error) {

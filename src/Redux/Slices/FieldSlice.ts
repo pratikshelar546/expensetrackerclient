@@ -3,7 +3,7 @@ import {
   expenseField,
 } from "@/assets/commanInterface/ComonInterface";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import apiClient from "@/utils/apiClient";
 
 
 
@@ -18,9 +18,9 @@ export const createField = createAsyncThunk(
   async ({ data, token }: { data: addField, token?: string }) => {
 
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "POST",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/createField`,
+        url: "field/createField",
         data,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
@@ -38,10 +38,9 @@ export const getField = createAsyncThunk(
   "field/getField",
   async ({ token, fieldType }: { fieldType?: string, token?: string }) => {
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field${fieldType ? `?fieldType=${fieldType}` : "/"
-          }`,
+        url: fieldType ? `field?fieldType=${fieldType}` : "field",
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
         },
@@ -58,9 +57,9 @@ export const deleteField = createAsyncThunk(
   "field/DeleteField",
   async ({ id, token }: { id: string, token?: string }) => {
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "DELETE",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}`,
+        url: `field/${id}`,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
         },
@@ -76,9 +75,9 @@ export const updateField = createAsyncThunk(
   "expenses/updateFields",
   async ({ data, id, token }: updateField) => {
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "PUT",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}/update`,
+        url: `field/${id}/update`,
         data,
         headers: {
           Authorization: `Bearer ${token}`, // Adding Bearer token in the Authorization header
@@ -95,9 +94,9 @@ export const getFieldById = createAsyncThunk(
   "field/getFieldById",
   async ({ id, token }: { id: string, token?: string }) => {
     try {
-      const response = await axios({
+      const response = await apiClient({
         method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}field/${id}`,
+        url: `field/${id}`,
         headers: {
           Authorization: `Bearer ${token}`,
         },
