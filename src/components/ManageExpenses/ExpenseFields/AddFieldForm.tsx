@@ -22,36 +22,22 @@ import { signIn, useSession } from "next-auth/react";
 
 import ExpensePoolDuration from "@/CommonComponent/ExpensePoolDuration";
 
-import TeamMemberChipInput, {
-
-  TeamMember,
-
-} from "./TeamMemberChipInput";
+import TeamMemberChipInput, { TeamMember } from "./TeamMemberChipInput";
 
 import { toast } from "react-toastify";
 
-
-
 const fieldTypeOptions = [{ value: "Personal" }, { value: "Team" }];
 
-
-
 export function AddFieldForm({
-
   fetchFieldData,
-
 }: {
-
   fetchFieldData: () => Promise<void>;
-
 }) {
-
   const dispatch = useAppDispatch();
 
   const { status, data: session } = useSession();
 
   const [field, setField] = useState<addField>({
-
     fieldName: "",
 
     RecivedAmount: "",
@@ -59,7 +45,6 @@ export function AddFieldForm({
     fieldType: "Personal",
 
     expiry: "",
-
   });
 
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -68,74 +53,49 @@ export function AddFieldForm({
 
   const { setOpen } = useModal();
 
-
-
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
     const { name, value } = e.target;
 
     setField((prev) => ({ ...prev, [name]: value }));
-
   };
 
-
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-
     e.preventDefault();
 
     if (field.fieldName === "") {
-
       setValidate(true);
 
       return;
-
     }
 
     try {
-
       if (status === "unauthenticated") {
-
         await signIn("google");
 
         return;
-
       }
 
       if (!session?.user?.token) return;
 
       setOpen(false);
 
-
-
       const payload: addField = {
-
         ...field,
 
         memberEmails:
-
           field.fieldType === "Team"
-
             ? teamMembers.map((member) => member.email)
-
             : [],
-
       };
 
-
-
       const response = await dispatch(
-
-        createField({ data: payload, token: session?.user?.token })
-
+        createField({ data: payload, token: session?.user?.token }),
       );
 
       if (createField.fulfilled.match(response)) {
-
         toast.success("Field created successfully");
 
         setField({
-
           fieldName: "",
 
           RecivedAmount: "",
@@ -143,259 +103,155 @@ export function AddFieldForm({
           fieldType: "Personal",
 
           expiry: "",
-
         });
 
         setTeamMembers([]);
 
         await fetchFieldData();
-
       } else if (createField.rejected.match(response)) {
         const payload = response.payload as {
           message?: string;
           invalidEmails?: string[];
         };
         if (payload?.invalidEmails?.length) {
-          toast.error(`User does not exist: ${payload.invalidEmails.join(", ")}`);
+          toast.error(
+            `User does not exist: ${payload.invalidEmails.join(", ")}`,
+          );
         } else {
           toast.error(payload?.message || "Failed to create Field");
         }
       } else {
-
         toast.error("An unexpected error occurred while creating field.");
-
       }
-
     } catch (error: any) {
-
       const invalidEmails = error?.response?.data?.invalidEmails;
 
       if (invalidEmails?.length) {
-
         toast.error(`User does not exist: ${invalidEmails.join(", ")}`);
 
         return;
-
       }
 
       const msg =
-
         error?.response?.data?.error ||
-
         error?.response?.data?.message ||
-
         error?.message ||
-
         "Something went wrong!";
 
       toast.error(msg);
-
     }
-
   };
 
-
-
   return (
-
     <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl shadow-input bg-transparent dark:bg-transparent">
-
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-
         Add New Expense Pool
-
       </h2>
 
       <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-
         Add new Expense pool where you can manage your expenses
-
       </p>
 
-
-
       <form className="mt-8" onSubmit={handleSubmit}>
-
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-
           <LabelInputContainer className="mb-4">
-
             <Label htmlFor="fieldName">Expense Pool Name</Label>
 
             <Input
-
               id="fieldName"
-
               name="fieldName"
-
               placeholder="Field 1"
-
               type="text"
-
               value={field.fieldName ? field.fieldName : ""}
-
               onChange={(e) => handleOnChange(e)}
-
             />
-
           </LabelInputContainer>
 
           <LabelInputContainer>
-
             <Label htmlFor="RecivedAmount">Budget Limit</Label>
 
             <Input
-
               id="RecivedAmount"
-
               placeholder="9999"
-
               name="RecivedAmount"
-
               value={field.RecivedAmount ? field.RecivedAmount : ""}
-
               type="number"
-
               onChange={(e) => handleOnChange(e)}
-
             />
-
           </LabelInputContainer>
-
         </div>
 
         <LabelInputContainer className="mb-4">
-
           <Label htmlFor="fieldType">Expense Pool Type</Label>
 
           <Dropdown
-
             id="fieldType"
-
             setField={setField}
-
             options={fieldTypeOptions}
-
             value={field.fieldType || "Personal"}
-
           />
-
         </LabelInputContainer>
 
-
-
         {field.fieldType === "Team" && (
-
           <LabelInputContainer className="mb-4">
-
             <TeamMemberChipInput
-
               members={teamMembers}
-
               onChange={setTeamMembers}
-
-              token={session?.user?.token}
-
+              token={session?.user?.token || ""}
             />
-
           </LabelInputContainer>
-
         )}
 
-
-
         <LabelInputContainer className="mb-4">
-
           <Label htmlFor="duration">Expense Pool Duration</Label>
 
           <ExpensePoolDuration
-
             onChange={(value) => setField({ ...field, expiry: value || "" })}
-
           />
 
           <p className="text-white">
-
             Selected Expiry Date: {field.expiry || "Not selected"}
-
           </p>
-
         </LabelInputContainer>
-
-
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <ModalClose
-
           validate={validate}
-
           className="dark bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-
         >
-
           Add Field &rarr;
-
           <BottomGradient />
-
         </ModalClose>
-
       </form>
-
     </div>
-
   );
-
 }
 
-
-
 const BottomGradient = () => {
-
   return (
-
     <>
-
       <span className="dark group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
 
       <span className="dark group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-
     </>
-
   );
-
 };
 
-
-
 export const LabelInputContainer = ({
-
   children,
 
   className,
-
 }: {
-
   children: React.ReactNode;
 
   className?: string;
-
 }) => {
-
   return (
-
     <div className={cn("flex flex-col space-y-2 w-full", className)}>
-
       {children}
-
     </div>
-
   );
-
 };
 
-
-
 export default AddFieldForm;
-
-
